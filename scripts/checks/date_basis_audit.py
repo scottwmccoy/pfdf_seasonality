@@ -200,18 +200,56 @@ def main() -> None:
     print("\n" + "-" * 76)
     print("6. PROCESS MIXING — are landslide-initiated flows in the analysis?")
     print("-" * 76)
-    ls = ev.initiation_class.astype(str).str.contains("landslide", na=False)
-    print(f"  events involving landslide initiation: {int(ls.sum())} of {len(ev)}")
+    # Sources that carry an initiation field in the published data. Everything
+    # else is set to "runoff-generated" by our loader from the source's title
+    # and stated scope — defensible, but an assumption, not an observation.
+    OBSERVES_INITIATION = {"literature": "InitiationMechanism",
+                           "oregon2024": "Primary_IT"}
+    print("  Which sources actually observe initiation mechanism?\n")
+    print(f"    {'source':<16} {'field':<20} {'classes present'}")
+    for src, grp in rec.groupby("source_key"):
+        field = OBSERVES_INITIATION.get(src, "-- none (assumed by loader) --")
+        counts = grp.initiation_class.value_counts().to_dict()
+        print(f"    {src:<16} {field:<20} {counts}")
+    assumed = sorted(set(rec.source_key) - set(OBSERVES_INITIATION))
+    n_assumed = int(rec.source_key.isin(assumed).sum())
+    print(f"\n  {len(OBSERVES_INITIATION)} of {rec.source_key.nunique()} sources report the field. "
+          f"The other {len(assumed)} contribute\n  {n_assumed} records whose class is an ASSUMPTION. "
+          "Say so in the paper rather than\n  implying every source was screened.")
+    # If a source outside the declared set ever shows a non-runoff class, the
+    # loader changed and this constant is stale.
+    stray = rec[~rec.source_key.isin(OBSERVES_INITIATION)
+                & (rec.initiation_class != "runoff-generated")]
+    if len(stray):
+        print(f"\n  !! {len(stray)} records from {sorted(set(stray.source_key))} carry a "
+              "non-runoff class\n     but are not in OBSERVES_INITIATION — update this constant.")
+
+    ls = ev.initiation_class.astype(str).str.contains("landslide|mixed", na=False)
+    print(f"\n  events involving landslide initiation: {int(ls.sum())} of {len(ev)}")
     print(f"  their months: {sorted(ev[ls].event_date.dt.month.tolist())}")
-    print("\n  They skew hard to the wet season, which is what a saturation-driven")
-    print("  process should do. No analysis script filters on initiation_class, so")
-    print("  they are in the results. That is CONSERVATIVE for this paper's claim:")
-    print("  a saturation process dilutes an intensity signal rather than creating")
-    print("  one. Measured on the 60-min gauge analysis, excluding them moves the")
-    print("  decisive subset from 73.6% to 74.4% intense (8.0% to 8.1% wettest,")
-    print("  ratio 9.1:1 either way) and the winter mean date from 25 to 24 Dec.")
-    print("  The paper should say it includes them and that excluding them does")
-    print("  not change the answer, rather than quietly dropping them.")
+    print("  They skew hard to the wet season, which is what a saturation-driven")
+    print("  process should do.\n")
+
+    # What actually reaches the analysis, computed rather than remembered.
+    from pfdf_seasonality.events import load_events
+    stages = [("compiled*", dict(window_years=None, runoff_policy=None)),
+              ("+ 2-yr window", dict(runoff_policy=None)),
+              ("+ runoff filter", dict())]
+    print(f"    {'stage':<18} {'events':>7} {'landslide-involved':>20}")
+    for label, kw in stages:
+        sub = load_events(verbose=False, **kw)
+        n_ls = int(sub.initiation_class.astype(str)
+                   .str.contains("landslide|mixed", na=False).sum())
+        print(f"    {label:<18} {len(sub):>7} {n_ls:>20}")
+    print("    * 344, not 345: one event is dated before its own fire and is")
+    print("      dropped as impossible before either filter runs.")
+    print("\n  The window alone is a POOR process filter — it keeps more than half")
+    print("  the landslide events (western Cascades shallow landslides arrive in")
+    print("  months, not years) while discarding five runoff-generated events for")
+    print("  every landslide one. The initiation filter is what does this job.")
+    print("  Events still counted as landslide-involved at the last stage are the")
+    print("  mixed ones kept under policy='any': each also has a runoff-generated")
+    print("  record, so a runoff-generated flow did occur on that storm date.")
 
     # ---------------------------------------------------------------- verdict
     print("\n" + "=" * 76)

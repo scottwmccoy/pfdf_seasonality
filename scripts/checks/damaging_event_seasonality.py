@@ -33,6 +33,7 @@ import pandas as pd
 from scipy.spatial import cKDTree
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from pfdf_seasonality.events import load_events  # noqa: E402
 from pfdf_seasonality.paths import FIGURES, PROCESSED, REPORTS  # noqa: E402
 from pfdf_seasonality.seasons import (SEASONS, MONTH_TO_SEASON, circular,  # noqa: E402
                                       doy_to_date, to_xy)
@@ -98,9 +99,10 @@ def summarize(df: pd.DataFrame, label: str) -> dict:
 def main() -> None:
     stn = pd.read_csv(PROCESSED / "seasonality" / "atlas14_station_seasonality.csv")
 
-    # ---- ours: mapped debris-flow events
-    ev = pd.read_csv(PROCESSED / "inventory" / "pfdf_events_compiled.csv",
-                     low_memory=False, parse_dates=["event_date"])
+    # ---- ours: mapped debris-flow events, scoped exactly as the paper scopes
+    # them (2-yr post-fire window, runoff-generated only) so the comparison is
+    # against the analyzed population rather than the whole database.
+    ev = load_events(verbose=True)
     ev = ev.dropna(subset=["latitude", "longitude", "event_date"])
     ev["month"] = ev.event_date.dt.month
     ev["doy"] = ev.event_date.dt.dayofyear

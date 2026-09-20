@@ -56,34 +56,44 @@ PINS: list[Pin] = [
     Pin("compilation_report.txt", "debris-flow records after de-duplication",
         r"after de-duplication\s+:\s+(\d+)", 3634, quoted_in="abstract: 'over 3,500'"),
 
+    # ------------------------------------------------ the analysis-stage scope
+    # Guards the two filters in `pfdf_seasonality.events`. If either is silently
+    # disabled, these move before any result does.
+    Pin("analysis_report.txt", "events inside the 2-year post-fire window",
+        r"-> (\d+) within 2 yr of fire", 302,
+        quoted_in="paper methods: the post-fire window"),
+    Pin("analysis_report.txt", "events after the runoff-generated filter",
+        r"-> (\d+) runoff-generated", 298,
+        quoted_in="paper methods: landslide-initiated events excluded"),
+
     # -------------------------------------------- the core result (60-min gauge)
     Pin("analysis_report.txt", "60-min M2 minus M1 log-likelihood",
-        r"M2 - M1 = \+([\d.]+)", 126.5, tol=0.05,
+        r"M2 - M1 = \+([\d.]+)", 126.4, tol=0.05,
         after="60m short-duration model",
         quoted_in="abstract: 'intensity model beats both'"),
     Pin("analysis_report.txt", "decisive subset size (60-min)",
         r"60m: (\d+)/\d+ events where wettest", 76,
         quoted_in="abstract: '28% of events'"),
     Pin("analysis_report.txt", "events scored at 60-min",
-        r"60m: \d+/(\d+) events where wettest", 273,
+        r"60m: \d+/(\d+) events where wettest", 270,
         quoted_in="abstract: '28% of events' denominator"),
     Pin("analysis_report.txt", "decisive flows in the most-intense season",
         r"debris flow in the most-intense-60m season\s*:\s*([\d.]+)%", 73.7, tol=0.05,
         quoted_in="abstract: '74%' of the 9:1"),
     Pin("analysis_report.txt", "decisive flows in the wettest season",
         r"debris flow in the wettest season\s*:\s*([\d.]+)%", 7.9, tol=0.05,
-        after="60m: 76/273", quoted_in="abstract: '8%' of the 9:1"),
+        after="60m: 76/270", quoted_in="abstract: '8%' of the 9:1"),
 
     # ------------------------------------------------------------- the regimes
     Pin("analysis_report.txt", "winter regime, n events",
-        r"DJF-dominant rainfall\s+\(n = (\d+)", 137),
+        r"DJF-dominant rainfall\s+\(n = (\d+)", 134),
     # anchored on the regime header, not on each other's values, so a change in
     # R does not also break the date pin with a misleading "wording changed"
     Pin("analysis_report.txt", "winter regime mean date",
-        r"mean debris-flow date (\d+ \w+)", "29 Dec",
-        after="DJF-dominant rainfall", quoted_in="abstract says 27 Dec - SUPERSEDED, see note below"),
+        r"mean debris-flow date (\d+ \w+)", "27 Dec",
+        after="DJF-dominant rainfall", quoted_in="abstract: '27 Dec'"),
     Pin("analysis_report.txt", "winter regime concentration R",
-        r"concentration R = ([\d.]+)", 0.50, tol=0.005,
+        r"concentration R = ([\d.]+)", 0.49, tol=0.005,
         after="DJF-dominant rainfall"),
     Pin("analysis_report.txt", "summer regime, n events",
         r"JJA-dominant rainfall\s+\(n = (\d+)", 135),
@@ -117,17 +127,17 @@ PINS: list[Pin] = [
 
     # ------------------------------------------------- the a priori forecast
     Pin("first_flow_prediction_report.txt", "pooled median error, clock forecast",
-        r"median \|error\|, clock\s+\d+d\s+\d+d\s+(\d+)d", 38,
+        r"median \|error\|, clock\s+\d+d\s+\d+d\s+(\d+)d", 39,
         quoted_in="abstract: '41-day median error'"),
     Pin("first_flow_prediction_report.txt", "pooled median error, fitted constant lag",
-        r"median \|error\|, const-lag fit\s+\d+d\s+\d+d\s+(\d+)d", 54,
+        r"median \|error\|, const-lag fit\s+\d+d\s+\d+d\s+(\d+)d", 52,
         quoted_in="abstract: 'beating a constant-lag model (67 days)'"),
     Pin("first_flow_prediction_report.txt", "summer nearest-branch median error",
         r"JJA: P\(first season\) = \d+%;\s+nearest-branch median \|error\| (\d+) d", 23,
         quoted_in="paper: monsoon is date-predictable"),
     Pin("first_flow_prediction_report.txt", "winter window coverage",
         r"DJF: window width median \d+ mo \(\d+% of the year\); first-window coverage (\d+)%",
-        70, quoted_in="paper: winter is window-predictable"),
+        69, quoted_in="paper: winter is window-predictable"),
 
     # --------------------------------------------------- the product choice
     Pin("seasonality_product_evaluation_report.txt",
@@ -158,11 +168,11 @@ PINS: list[Pin] = [
 
     # ------------------------------ CONUS404 as the second line of evidence
     Pin("conus404_hourly_analysis_report.txt", "decisive subset size (1-hour)",
-        r"(\d+)/294 events where wettest season", 91),
+        r"(\d+)/290 events where wettest season", 90),
     Pin("conus404_hourly_analysis_report.txt", "decisive flows in the intense season",
-        r"debris flow in the most-intense season :\s+([\d.]+)%", 57.1, tol=0.05),
+        r"debris flow in the most-intense season :\s+([\d.]+)%", 57.8, tol=0.05),
     Pin("conus404_hourly_analysis_report.txt", "decisive flows in the wettest season",
-        r"debris flow in the wettest season\s+:\s+([\d.]+)%", 12.1, tol=0.05),
+        r"debris flow in the wettest season\s+:\s+([\d.]+)%", 12.2, tol=0.05),
 ]
 
 
@@ -235,6 +245,46 @@ def test_gauges_still_beat_every_reanalysis_product():
     assert max(gauges) > max(models), (
         f"best gauge product {max(gauges)}% no longer beats the best reanalysis "
         f"product {max(models)}%; the gauge-only framing would need revisiting")
+
+
+def test_no_landslide_initiated_event_reaches_the_analysis():
+    """The paper is about runoff-generated debris flows.
+
+    `load_events` is the only door into the analysis, so an event the source
+    attributed to landsliding must not come through it. Under the default
+    `policy="any"` an event may still carry a landslide record provided it also
+    carries a runoff-generated one — the storm date is then a real
+    runoff-generated occurrence — so the assertion is 'no landslide WITHOUT
+    runoff', not 'no landslide at all'. `policy="all"` is the stricter variant
+    and is checked too.
+    """
+    import pandas as pd
+    from pfdf_seasonality.events import (LANDSLIDE_CLASSES, _class_set,
+                                         load_events)
+    from pfdf_seasonality.paths import PROCESSED
+    if not (PROCESSED / "inventory" / "pfdf_events_compiled.csv").exists():
+        pytest.skip("compiled events not present")
+
+    def offenders(ev: pd.DataFrame, allow_mixed: bool) -> pd.DataFrame:
+        cls = _class_set(ev.initiation_class)
+        bad = cls.map(lambda c: bool(c & set(LANDSLIDE_CLASSES)))
+        if allow_mixed:
+            bad &= cls.map(lambda c: "runoff-generated" not in c)
+        return ev[bad]
+
+    for policy, allow_mixed in [("any", True), ("all", False)]:
+        ev = load_events(runoff_policy=policy, verbose=False)
+        bad = offenders(ev, allow_mixed)
+        assert bad.empty, (
+            f"policy={policy!r} let {len(bad)} landslide-initiated events through: "
+            f"{bad.event_id.tolist()[:5]}")
+
+    # and the filter must actually be doing something, or the guarantee above
+    # would be vacuous the day the compilation stops recording initiation
+    unfiltered = load_events(runoff_policy=None, verbose=False)
+    assert len(offenders(unfiltered, allow_mixed=True)) > 0, (
+        "no landslide-initiated events in the compilation at all — either the "
+        "inventory changed or initiation_class stopped being populated")
 
 
 def test_no_event_is_silently_survey_dated():
