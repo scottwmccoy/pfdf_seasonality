@@ -28,6 +28,7 @@ from scipy.spatial import cKDTree
 from scipy.stats import chi2
 from pfdf_seasonality.paths import CONUS404, PROCESSED, REPORTS, EVENTS
 from pfdf_seasonality.seasons import SEASONS, MONTH_TO_SEASON, EPS, LAT0, normalize, to_xy, circular, season_of, doy_to_date
+from pfdf_seasonality.report import tee
 
 C404 = CONUS404
 OUT = PROCESSED / "seasonality"
@@ -297,4 +298,7 @@ def main(source: str = "rate"):
 
 if __name__ == "__main__":
     import sys
-    main(sys.argv[1] if len(sys.argv) > 1 else "rate")
+    _src = sys.argv[1] if len(sys.argv) > 1 else "rate"
+    _name = "conus404_hourly_analysis_report.txt" if _src == "hourly" else "conus404_analysis_report.txt"
+    with tee(_name):
+        main(_src)

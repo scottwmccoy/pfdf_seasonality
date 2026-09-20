@@ -31,6 +31,7 @@ import pandas as pd
 import xarray as xr
 from pfdf_seasonality.paths import CONUS404, PROCESSED, REPORTS
 from pfdf_seasonality.seasons import SEASONS
+from pfdf_seasonality.report import tee
 
 warnings.filterwarnings("ignore")
 
@@ -120,4 +121,5 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    with tee("duration_sensitivity_report.txt"):
+        main()

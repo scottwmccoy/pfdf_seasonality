@@ -31,6 +31,7 @@ from scipy.spatial import cKDTree
 from scipy.stats import chi2
 from pfdf_seasonality.paths import PROCESSED, REPORTS, EVENTS
 from pfdf_seasonality.seasons import SEASONS, MONTH_TO_SEASON, EPS, LAT0, normalize, to_xy, circular, season_of, doy_to_date
+from pfdf_seasonality.report import tee
 
 OUT = PROCESSED / "seasonality"
 OUT.mkdir(exist_ok=True)
@@ -236,4 +237,5 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    with tee("analysis_report.txt"):
+        main()

@@ -39,6 +39,7 @@ import numpy as np
 import pandas as pd
 from pfdf_seasonality.paths import PROCESSED, REPORTS, EVENTS_MTBS
 from pfdf_seasonality.seasons import SEASONS as _SEASONS, circular_mean_doy
+from pfdf_seasonality.report import tee
 
 MTBS = EVENTS_MTBS
 GAUGE = PROCESSED / "seasonality" / "pfdf_events_gauge_seasonality.csv"
@@ -153,4 +154,5 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    with tee("ignition_lag_report.txt"):
+        main()

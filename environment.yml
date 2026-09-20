@@ -41,6 +41,10 @@ dependencies:
   - geopandas=1.1
   - shapely=2.1
   - rasterio=1.4
+  # pandas reads several source inventories from .xlsx and imports openpyxl
+  # lazily, so a static import scan does not reveal this one. Needed by
+  # 00_compile_inventory.py; the rest of the pipeline runs without it.
+  - openpyxl=3.1
   # tests
   - pytest
   # install this package in editable mode

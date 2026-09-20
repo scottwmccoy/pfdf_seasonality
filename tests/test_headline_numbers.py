@@ -52,36 +52,36 @@ class Pin:
 PINS: list[Pin] = [
     # ---------------------------------------------------------- the database
     Pin("compilation_report.txt", "unique fire-by-date events",
-        r"unique events\s+:\s+(\d+)", 349, quoted_in="abstract: 'over 300'"),
+        r"unique events\s+:\s+(\d+)", 345, quoted_in="abstract: 'over 300'"),
     Pin("compilation_report.txt", "debris-flow records after de-duplication",
-        r"after de-duplication\s+:\s+(\d+)", 3698, quoted_in="abstract: 'over 3,500'"),
+        r"after de-duplication\s+:\s+(\d+)", 3634, quoted_in="abstract: 'over 3,500'"),
 
     # -------------------------------------------- the core result (60-min gauge)
     Pin("analysis_report.txt", "60-min M2 minus M1 log-likelihood",
-        r"M2 - M1 = \+([\d.]+)", 153.2, tol=0.05,
+        r"M2 - M1 = \+([\d.]+)", 157.0, tol=0.05,
         after="60m short-duration model",
         quoted_in="abstract: 'intensity model beats both'"),
     Pin("analysis_report.txt", "decisive subset size (60-min)",
         r"60m: (\d+)/\d+ events where wettest", 87,
         quoted_in="abstract: '28% of events'"),
     Pin("analysis_report.txt", "events scored at 60-min",
-        r"60m: \d+/(\d+) events where wettest", 311,
+        r"60m: \d+/(\d+) events where wettest", 307,
         quoted_in="abstract: '28% of events' denominator"),
     Pin("analysis_report.txt", "decisive flows in the most-intense season",
         r"debris flow in the most-intense-60m season\s*:\s*([\d.]+)%", 73.6, tol=0.05,
         quoted_in="abstract: '74%' of the 9:1"),
     Pin("analysis_report.txt", "decisive flows in the wettest season",
         r"debris flow in the wettest season\s*:\s*([\d.]+)%", 8.0, tol=0.05,
-        after="60m: 87/311", quoted_in="abstract: '8%' of the 9:1"),
+        after="60m: 87/307", quoted_in="abstract: '8%' of the 9:1"),
 
     # ------------------------------------------------------------- the regimes
     Pin("analysis_report.txt", "winter regime, n events",
-        r"DJF-dominant rainfall\s+\(n = (\d+)", 162),
+        r"DJF-dominant rainfall\s+\(n = (\d+)", 158),
     # anchored on the regime header, not on each other's values, so a change in
     # R does not also break the date pin with a misleading "wording changed"
     Pin("analysis_report.txt", "winter regime mean date",
-        r"mean debris-flow date (\d+ \w+)", "27 Dec",
-        after="DJF-dominant rainfall", quoted_in="abstract: 'mean date 27 Dec'"),
+        r"mean debris-flow date (\d+ \w+)", "25 Dec",
+        after="DJF-dominant rainfall", quoted_in="abstract says 27 Dec - SUPERSEDED, see note below"),
     Pin("analysis_report.txt", "winter regime concentration R",
         r"concentration R = ([\d.]+)", 0.46, tol=0.005,
         after="DJF-dominant rainfall"),
@@ -111,7 +111,7 @@ PINS: list[Pin] = [
         r"JJA: caught the first intense season (\d+)%", 76,
         quoted_in="abstract: '76% (summer)'"),
     Pin("ignition_lag_report.txt", "winter: median |observed - clock|",
-        r"DJF: median \|observed - clock prediction\| = (\d+) d", 40),
+        r"DJF: median \|observed - clock prediction\| = (\d+) d", 39),
     Pin("ignition_lag_report.txt", "summer: median |observed - clock|",
         r"JJA: median \|observed - clock prediction\| = (\d+) d", 20),
 
@@ -158,7 +158,7 @@ PINS: list[Pin] = [
 
     # ------------------------------ CONUS404 as the second line of evidence
     Pin("conus404_hourly_analysis_report.txt", "decisive subset size (1-hour)",
-        r"(\d+)/338 events where wettest season", 103),
+        r"(\d+)/334 events where wettest season", 103),
     Pin("conus404_hourly_analysis_report.txt", "decisive flows in the intense season",
         r"debris flow in the most-intense season :\s+([\d.]+)%", 57.3, tol=0.05),
     Pin("conus404_hourly_analysis_report.txt", "decisive flows in the wettest season",
@@ -235,3 +235,25 @@ def test_gauges_still_beat_every_reanalysis_product():
     assert max(gauges) > max(models), (
         f"best gauge product {max(gauges)}% no longer beats the best reanalysis "
         f"product {max(models)}%; the gauge-only framing would need revisiting")
+
+
+def test_no_event_is_silently_survey_dated():
+    """Dolan was dated by field visits and image acquisitions for weeks before
+    anyone noticed. Any event built on an observation-dated record must carry
+    the `survey_dated` flag so timing work can exclude it."""
+    import pandas as pd
+    from pfdf_seasonality.paths import PROCESSED
+    f = PROCESSED / "inventory" / "pfdf_events_compiled.csv"
+    if not f.exists():
+        pytest.skip("compiled events not present")
+    ev = pd.read_csv(f, low_memory=False)
+    assert "date_basis" in ev.columns and "survey_dated" in ev.columns, (
+        "the compilation must record what each event's date means")
+    flagged = ev.date_basis.fillna("").str.contains("observation")
+    assert (ev.survey_dated.fillna(False).astype(bool) == flagged).all(), (
+        "survey_dated disagrees with date_basis")
+    # Dolan specifically: one storm, not four survey dates
+    dolan = ev[ev.fire_key.astype(str).str.contains("dolan", case=False, na=False)]
+    assert len(dolan) <= 2, (
+        f"Dolan has {len(dolan)} events; the segment inventory should sit on the "
+        "2021-01-27 storm, not on its survey dates")

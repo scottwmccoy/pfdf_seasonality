@@ -35,6 +35,7 @@ import numpy as np
 import pandas as pd
 from pfdf_seasonality.paths import PROCESSED, REPORTS, FIGURES
 from pfdf_seasonality import style
+from pfdf_seasonality.report import tee
 
 style.apply()
 
@@ -262,4 +263,5 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    with tee("first_flow_prediction_report.txt"):
+        main()

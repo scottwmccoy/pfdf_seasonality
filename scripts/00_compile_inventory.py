@@ -164,6 +164,9 @@ STD_COLS = [
     "location_quality",
     "event_date",
     "date_precision",
+    "date_basis",
+    "observation_date",
+    "date_reference",
     "n_flows",
     "initiation_type",
     "df_evidence",
@@ -180,6 +183,44 @@ STD_COLS = [
 #   point       - a mapped debris-flow location (initiation point, outlet, or deposit)
 #   general     - somewhere in the burned area / study area, km-scale uncertainty
 #   fire_scale  - fire-perimeter centroid; represents the fire, not the debris flow
+
+# date_basis - WHAT `event_date` ACTUALLY MEANS. Added 2026-09-20 after the Dolan
+# inventory was found to be dated by survey rather than by storm, which split one
+# atmospheric river into four spurious events. `event_date` is always the best
+# available estimate of WHEN THE DEBRIS FLOW OCCURRED; `observation_date` keeps the
+# raw date the source reported when the two differ.
+#   storm                - the source gives the triggering storm's date
+#   debris_flow          - the source gives the flow's own date
+#   observation          - the source gives only a survey / imagery date, used as a
+#                          proxy. NOT a date of occurrence; suspect for timing work
+#   assigned_literature  - we set the date from a cited publication; see
+#                          `date_reference`
+DATE_BASIS = {
+    "cavagnaro2025": "storm",           # StormDate
+    "graber2023": "storm",              # StormStart, falls back to ObservationDate
+    "graber2024": "storm",              # StormStart, falls back to ObservationDate
+    "volumes227": "debris_flow",        # DebrisFlowDate
+    "czu2021": "storm",                 # StormStart
+    "dixie2023": "storm",               # StormStart
+    "dolan2020": "assigned_literature",  # see DOLAN_STORM_DATE below
+    "oregon2024": "observation",        # Observation_Date; no storm date published
+    "literature": "debris_flow",        # DateOfFlow, else ApproxDateOfFlow
+    "oakley2025": "storm",              # EventDate
+}
+
+# The Dolan release records ObservationDate, defined in its README as the Google
+# Earth image-acquisition date for remotely mapped segments and the field-visit
+# date otherwise. Treating those as dates of occurrence split one storm into four
+# events (2021-02-23, 2021-02-26, 2021-07-01, 2022-01-15). The triggering storm is
+# a single, well-documented atmospheric river.
+DOLAN_STORM_DATE = "2021-01-27"
+DOLAN_DATE_REFERENCE = (
+    "Cavagnaro, D.B., McCoy, S.W., Thomas, M.A., Kostelnik, J., and Lindsay, D.N., "
+    "2025, Improved prediction of postfire debris flows through rainfall anomaly "
+    "maps: Geophysical Research Letters 52, e2025GL114791, doi:10.1029/2025GL114791 "
+    '("On 27 January 2021, the area received intense rainfall ... triggering '
+    'numerous debris flows and floods across the burn area")'
+)
 
 # ----------------------------------------------------------------------------
 # helpers
@@ -283,6 +324,15 @@ def finish(df: pd.DataFrame, source_key: str) -> pd.DataFrame:
     df["longitude"] = clean_num(df["longitude"])
     df["event_date"] = parse_date(df["event_date"])
     df["fire_start_date"] = parse_date(df["fire_start_date"])
+    df["observation_date"] = parse_date(df["observation_date"])
+
+    # What does `event_date` mean for this source? See DATE_BASIS.
+    if df["date_basis"].isna().all():
+        df["date_basis"] = DATE_BASIS.get(source_key, "unknown")
+    # Where the source gives only a survey date, event_date IS the observation
+    # date; record that explicitly rather than leaving the field empty.
+    obs_only = df["date_basis"].eq("observation") & df["observation_date"].isna()
+    df.loc[obs_only, "observation_date"] = df.loc[obs_only, "event_date"]
     for c in ["peak_i15_mmh", "peak_i30_mmh", "peak_i60_mmh", "volume_m3", "fire_year"]:
         df[c] = clean_num(df[c])
 
@@ -469,9 +519,15 @@ def load_dolan2020() -> pd.DataFrame:
             "state": d["FireState"],
             "latitude": d["ObservationLatitude"],
             "longitude": d["ObservationLongitude"],
-            "location_type": "observation_point",
+            "location_type": "channel_segment",
             "location_quality": "point",
-            "event_date": d["ObservationDate"],
+            # ObservationDate is the Google Earth image-acquisition date or the
+            # field-visit date (see the release README), NOT a date of occurrence.
+            # All of these segments record the response to one atmospheric river.
+            "event_date": DOLAN_STORM_DATE,
+            "observation_date": d["ObservationDate"],
+            "date_basis": "assigned_literature",
+            "date_reference": DOLAN_DATE_REFERENCE,
             "date_precision": "day",
             "n_flows": 1,
             "initiation_type": "runoff-generated",
@@ -480,7 +536,8 @@ def load_dolan2020() -> pd.DataFrame:
             ),
             "source_record_id": d["FireSegmentID"].astype(str),
             "original_source": d["ObservationSource"],
-            "notes": "stream-segment-scale mapping of a single fire; many records per event",
+            "notes": "stream-segment-scale mapping of one fire; date assigned from "
+                     "the triggering storm, not the survey",
         }
     )
     return finish(out, "dolan2020")
@@ -713,6 +770,11 @@ def build_events(points: pd.DataFrame, oakley: pd.DataFrame, day_tol: int = 1):
             peak_i30_mmh=("peak_i30_mmh", "max"),
             peak_i60_mmh=("peak_i60_mmh", "max"),
             sources=("source_key", lambda s: "|".join(sorted(set(s)))),
+            # An event can draw on records with different date bases. Keep the
+            # full set, and flag the event as survey-dated if ANY record is,
+            # because that is the weakest link for timing work.
+            date_basis=("date_basis", lambda s: "|".join(sorted(set(s.dropna())))),
+            survey_dated=("date_basis", lambda s: bool((s == "observation").any())),
             initiation_class=(
                 "initiation_class",
                 lambda s: "|".join(sorted(set(s.dropna()))) or "unknown",
