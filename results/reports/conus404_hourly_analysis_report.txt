@@ -1,0 +1,118 @@
+CONUS404 hourly: 16 tiles, 45 water years, 100% of the western box covered
+CONUS404 intensity metric: 1-hour accumulation
+
+338 events; all within 2.9 km of a CONUS404 cell centre (median 1.7 km)
+
+==========================================================================
+MODEL COMPARISON — total log-likelihood of observed debris-flow months
+==========================================================================
+  n = 338 events (all of them - CONUS404 has no coverage gaps)
+    M0 uniform        LL =    -839.9
+    M1 wet-season     LL =    -816.8   (vs uniform: +23.1)
+    M2 short-duration LL =    -732.1   (vs uniform: +107.8)
+    M2 - M1 = +84.7  ->  SHORT-DURATION model wins
+
+==========================================================================
+DECISIVE SUBSET — events where the two models disagree on the season
+==========================================================================
+  103/338 events where wettest season != most intense season
+    debris flow in the most-intense season :  57.3%
+    debris flow in the wettest season      :  11.7%
+    neither                                :  31.1%
+    (where the two agree, n=235: 65.1% in that season)
+
+  sensitivity: 15 events predate WY1980. Dropping them, the decisive subset is n=102 with 57.8% in the intense season vs 11.8% in the wettest.
+
+==========================================================================
+ROBUSTNESS — is it just 'whichever rainy season arrives first'?
+==========================================================================
+  decisive subset with a fire date, n = 85
+    intense season arrives first     n= 45   flows in intense season  53.3%   in wettest  15.6%
+    wettest season arrives first     n= 40   flows in intense season  70.0%   in wettest   5.0%
+
+==========================================================================
+DEBRIS-FLOW TIMING BY CONUS404-DEFINED RAINFALL REGIME
+==========================================================================
+
+  DJF-dominant intense rainfall  (n = 162 events, CA, NV, OR, WA)
+    mean debris-flow date 24 Dec, R = 0.39, Rayleigh p = 1.3e-11
+    peak months: Jan (37), Feb (28), Dec (25)
+    in the locally most-intense season: 56%
+
+  JJA-dominant intense rainfall  (n = 135 events, AZ, CA, CO, MT, NM, UT, WA)
+    mean debris-flow date 31 Jul, R = 0.89, Rayleigh p = 3.3e-63
+    peak months: Jul (71), Aug (33), Sep (20)
+    in the locally most-intense season: 81%
+
+  MAM-dominant intense rainfall  (n = 7 events, CA, ID, UT, WA)
+    mean debris-flow date 03 Jul, R = 0.51, Rayleigh p = 1.6e-01
+    peak months: Jul (4), Mar (2), Sep (1)
+    in the locally most-intense season: 29%
+
+  SON-dominant intense rainfall  (n = 34 events, CA, CO, ID, OR, UT, WA)
+    mean debris-flow date 22 Sep, R = 0.23, Rayleigh p = 1.7e-01
+    peak months: Aug (7), Sep (5), Feb (5)
+    in the locally most-intense season: 32%
+
+==========================================================================
+POOLED MONTH DISTRIBUTION — observed vs model expectation
+==========================================================================
+   month  observed   short-duration   wet-season
+    Jan       39           35.8         51.3
+    Feb       33           33.6         51.9
+    Mar        9           24.5         43.4
+    Apr        4           10.6         21.0
+    May        5           12.5         13.9
+    Jun       10           13.3          8.4
+    Jul       94           41.7         18.4
+    Aug       52           55.8         21.6
+    Sep       33           31.0         18.1
+    Oct       14           19.2         18.8
+    Nov       19           27.5         28.0
+    Dec       26           32.6         43.0
+  chi2 vs short-duration  =     90.7  (df=11, p = 1.19e-14)
+  chi2 vs wet-season      =    433.6  (df=11, p = 4.38e-86)
+
+==========================================================================
+CONUS404 vs ATLAS 14 GAUGES AT THE SAME POINTS
+==========================================================================
+
+  15m gauges (n=436) vs CONUS404 annual-max month (1-hour accumulation):
+    same dominant season   :  80.3%
+    median total-variation distance between monthly distributions: 0.29
+CONUS404  DJF  MAM  JJA  SON
+gauge                       
+DJF       125    1    3    6
+MAM         3    4    2    1
+JJA        16   17  212    3
+SON        18    9    7    9
+
+  30m gauges (n=437) vs CONUS404 annual-max month (1-hour accumulation):
+    same dominant season   :  82.8%
+    median total-variation distance between monthly distributions: 0.27
+CONUS404  DJF  MAM  JJA  SON
+gauge                       
+DJF       133    1    2    7
+MAM         2    4    4    0
+JJA        10   22  216    3
+SON        18    4    2    9
+
+  60m gauges (n=1253) vs CONUS404 annual-max month (1-hour accumulation):
+    same dominant season   :  83.2%
+    median total-variation distance between monthly distributions: 0.25
+CONUS404  DJF  MAM  JJA  SON
+gauge                       
+DJF       342    3    9   30
+MAM         3   20    4    3
+JJA        15   83  663   21
+SON        15    8   17   17
+
+==========================================================================
+HEADLINE — decisive subset, both lines of evidence
+==========================================================================
+           label   n  pct_intense   pct_wet
+  gauges\n60-min  87    73.563218  8.045977
+  gauges\n15-min  71    71.830986  8.450704
+CONUS404\n1-hour 103    57.281553 11.650485
+
+wrote /Users/scottmccoy/Library/CloudStorage/Box-Box/SWMresearch/PostFireDebrisFlows/Seasonality/rainfall_seasonality/compiled/pfdf_events_conus404_seasonality_hourly.csv

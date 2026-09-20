@@ -1,0 +1,30 @@
+# Bulk data and generated figures live in the Box tree, never here.
+# See src/pfdf_seasonality/paths.py.
+data/
+results/figures/
+
+# Generated text reports ARE committed (results/reports/) - they are small and
+# they are the provenance record for every number in the manuscript.
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Environments
+.venv/
+venv/
+
+# OS / editor
+.DS_Store
+Icon?
+*.swp
+.vscode/
+.idea/
+
+# Local, machine-specific Claude config
+CLAUDE.local.md

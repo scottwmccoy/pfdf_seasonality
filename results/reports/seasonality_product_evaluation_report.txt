@@ -1,0 +1,153 @@
+==========================================================================
+1. THE 15-MINUTE PRODUCT, MEASURED DIRECTLY
+==========================================================================
+  187,536 CONUS404 cells inside the 11 western states; 187,535 with all three products defined
+
+  15-min vs CONUS404 1-hour :  80.4% same dominant season (n=187,535)
+  15-min vs CONUS404 rate   :  86.6% same dominant season (n=187,535)
+  rate   vs 1-hour          :  80.6%  (yesterday's bracket width)
+
+  15-min vs 1-hour, by season:
+1hour    DJF    MAM     JJA    SON
+15min                             
+DJF    69293     90       5   1540
+MAM     1861   8315     752    571
+JJA     5261  16253  171996   8794
+SON     9440    305    2022  43933
+
+--------------------------------------------------------------------------
+  BRACKET TEST: yesterday's claim was that where rate and 1-hour agree,
+  the 15-min answer is pinned to that value.
+--------------------------------------------------------------------------
+    where rate == 1-hour (n=151,170): 15-min agrees 92.7% of the time
+    where they differ    (n=36,365): 15-min sides with 1-hour 29.6%, with rate 61.3%, neither 9.0%
+
+  15-min exc1yr vs exc24 (local vs fixed threshold): 87.8% (n=185,482)
+  15-min wettest vs CONUS404 wettest season        : 97.7% (n=187,536)
+
+--------------------------------------------------------------------------
+  CONTROL: duration effect or metric effect?
+  Dave's rasters count exceedances of the local 1-yr level; the
+  comparisons above used our month-of-annual-max season. Recomputing
+  ours as exceedance counts isolates duration from metric:
+--------------------------------------------------------------------------
+    15-min vs CONUS404 1-hour:  80.4% (month-of-max metric) ->  84.0% (exceedance metric, n=187,535)
+    15-min vs CONUS404 rate  :  86.6% (month-of-max metric) ->  89.3% (exceedance metric, n=187,535)
+    rate vs 1-hour on the exceedance metric: 82.6%
+
+--------------------------------------------------------------------------
+  WHERE THE PRODUCTS DIVERGE, BY STATE
+--------------------------------------------------------------------------
+          vs 1-hour   vs rate    15-min DJF%  1-hr DJF%  rate DJF%
+    NV        54.9%     78.5%           1.0%       4.6%       0.8%
+    CA        59.1%     65.9%          40.1%      70.9%      54.9%
+    OR        60.0%     82.4%           1.1%       8.8%       1.3%
+    ID        69.0%     89.4%           0.0%       0.0%       0.0%
+    WA        73.5%     81.2%           0.4%       4.0%       0.4%
+    UT        77.7%     85.9%           0.0%       0.0%       0.0%
+    AZ        95.4%     87.3%           0.0%       1.1%       0.4%
+    WY        95.8%     99.6%           0.0%       0.0%       0.0%
+    NM        96.5%     88.5%           0.0%       0.0%       0.0%
+    MT        98.8%    100.0%           0.0%       0.0%       0.0%
+    CO        99.3%     98.3%           0.0%       0.0%       0.0%
+
+  'DJF%' is the share of each state's land the product calls
+  winter-dominant. A product that shrinks DJF in California is
+  moving the winter/summer regime boundary where most events are.
+
+  CALIFORNIA, winter-dominant share of land under every variant:
+    CONUS404 1-hour, month-of-max :  70.9%
+    CONUS404 1-hour, exceedance   :  69.5%
+    CONUS404 rate,   month-of-max :  54.9%
+    CONUS404 rate,   exceedance   :  53.7%
+    15-min reanalysis, exceedance :  40.1%
+
+  If the 15-min value sits outside the span of our four, the
+  difference is not duration alone - it is a different dataset
+  (period 1980-2021 vs 1980-2024, and a different model run).
+
+==========================================================================
+2. AGAINST THE GAUGES — does finer model resolution match observations
+   better? (Atlas 14 station AMS is the only true 15-min observation)
+==========================================================================
+
+  % of stations where the gridded product matches the gauge's own
+  dominant season (columns = gauge AMS duration):
+gauge               15m   30m   60m
+product                            
+15-min reanalysis  84.3  85.1  85.0
+CONUS404 1-hour    79.8  82.8  83.2
+CONUS404 rate      84.4  87.2  84.3
+
+  n stations: 15m 434, 30m 435, 60m 1,249
+
+  Against TRUE 15-min observations, the best gridded product is: CONUS404 rate
+
+==========================================================================
+3. THE TEST THAT MATTERS — skill at the observed month of real
+   debris flows
+==========================================================================
+
+  COVERAGE — how many of the 349 events each product can classify:
+    A14-region  60-min     gauge  311 events  (92%)
+    A14-AMS     15-min     gauge  234 events  (69%)
+    A14-AMS     30-min     gauge  234 events  (69%)
+    A14-AMS     60-min     gauge  311 events  (92%)
+    C404        rate       model  338 events  (100%)
+    C404        1-hour     model  338 events  (100%)
+    R15 exc1yr  15-min     model  338 events  (100%)
+    R15 exc24   15-min     model  336 events  (99%)
+
+  The Atlas 14 shortfall is OR and WA, which Atlas 14 never published.
+
+  Common subset where every product is defined: n = 232
+
+--------------------------------------------------------------------------
+  ALL EVENTS EACH PRODUCT COVERS
+--------------------------------------------------------------------------
+    product                   n   hit% | decisive subset:    n  intense%  wettest%
+    A14-region  60-min      311   68.8 |                    94      75.5       7.4
+    A14-AMS     15-min      234   66.2 |                    71      71.8       8.5
+    A14-AMS     30-min      234   62.0 |                    63      66.7      11.1
+    A14-AMS     60-min      311   66.6 |                    87      73.6       8.0
+    C404        rate        338   66.3 |                   123      60.2      12.2
+    C404        1-hour      338   62.7 |                   103      57.3      11.7
+    R15 exc1yr  15-min      338   67.8 |                   145      61.4      14.5
+    R15 exc24   15-min      336   67.9 |                   145      61.4      15.2
+    (uniform baseline)            25.0 |
+
+--------------------------------------------------------------------------
+  COMMON SUBSET (identical events, each product's own wettest map)
+--------------------------------------------------------------------------
+    product                   n   hit% | decisive subset:    n  intense%  wettest%
+    A14-region  60-min      232   64.2 |                    63      71.4       9.5
+    A14-AMS     15-min      232   66.4 |                    70      71.4       8.6
+    A14-AMS     30-min      232   62.1 |                    62      66.1      11.3
+    A14-AMS     60-min      232   61.2 |                    56      67.9      10.7
+    C404        rate        232   62.1 |                    78      61.5      11.5
+    C404        1-hour      232   60.3 |                    69      62.3      11.6
+    R15 exc1yr  15-min      232   66.4 |                   101      66.3      13.9
+    R15 exc24   15-min      232   65.5 |                   103      65.0      15.5
+    (uniform baseline)            25.0 |
+
+--------------------------------------------------------------------------
+  COMMON SUBSET, FIXED AMOUNT REFERENCE (NCEI normals wettest season)
+--------------------------------------------------------------------------
+    product                   n   hit% | decisive subset:    n  intense%  wettest%
+    A14-region  60-min      232   64.2 |                    63      71.4       9.5
+    A14-AMS     15-min      232   66.4 |                    70      71.4       8.6
+    A14-AMS     30-min      232   62.1 |                    62      66.1      11.3
+    A14-AMS     60-min      232   61.2 |                    56      67.9      10.7
+    C404        rate        232   62.1 |                    72      62.5      15.3
+    C404        1-hour      232   60.3 |                    60      65.0      15.0
+    R15 exc1yr  15-min      232   66.4 |                    89      65.2      15.7
+    R15 exc24   15-min      232   65.5 |                    89      64.0      16.9
+    (uniform baseline)            25.0 |
+
+  'hit%' = share of debris flows whose observed season equals the
+  product's predicted most-intense season. 'decisive subset' keeps
+  only events where that product's own wettest and most-intense
+  seasons differ, which is where intensity and amount make opposite
+  predictions and the comparison is diagnostic.
+
+wrote /Users/scottmccoy/Library/CloudStorage/Box-Box/SWMresearch/PostFireDebrisFlows/Seasonality/results/figures/seasonality_product_evaluation.png

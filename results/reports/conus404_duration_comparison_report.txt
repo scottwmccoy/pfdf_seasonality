@@ -1,0 +1,88 @@
+==========================================================================
+CONUS404 DURATION BRACKET: instantaneous rate vs 1-hour accumulation
+==========================================================================
+rate    : 45 water years, grid 600 x 585
+1-hour  : 100% of box covered
+land mask: 187,536 of 351,000 cells inside the 11 western states
+
+--------------------------------------------------------------------------
+1. SEASON OF THE ANNUAL MAXIMUM (the metric used in the analysis)
+--------------------------------------------------------------------------
+  same dominant season, rate vs 1-hour : 80.5%  (n = 187,536 land cells)
+rate      DJF   MAM     JJA    SON
+hourly                            
+DJF     13123   974    2920   3839
+MAM       135  9168   15360    712
+JJA        72   479  117723   6429
+SON       939   523    4148  10992
+
+  |circular mean date difference|      : median 8 d, 90th pct 35 d
+  where they AGREE    median margin (top - 2nd season share, 1-hour): 0.31
+  where they DISAGREE median margin                                : 0.09
+  -> disagreement lives in weakly seasonal cells
+
+  disagreeing land cells by state:
+    NV   42.5% of 17,350 cells
+    OR   38.2% of 15,274 cells
+    CA   30.5% of 24,977 cells
+    ID   28.7% of 13,185 cells
+    WA   26.3% of 10,978 cells
+    UT   24.6% of 13,322 cells
+    AZ   12.3% of 18,102 cells
+    NM   11.6% of 19,294 cells
+    WY    4.4% of 15,367 cells
+    CO    1.9% of 16,339 cells
+    MT    1.3% of 23,348 cells
+
+--------------------------------------------------------------------------
+2. SEASON WITH MOST EXCEEDANCES OF THE 1-YR LEVEL (the reference maps' metric)
+--------------------------------------------------------------------------
+  same dominant season, rate vs 1-hour : 82.6%  (n = 187,536; 0 too-dry cells excluded)
+rate      DJF   MAM     JJA   SON
+hourly                           
+DJF     12690   842    3047  3001
+MAM       178  6375   14644   350
+JJA        32   281  126185  5159
+SON       918   348    3780  9706
+
+--------------------------------------------------------------------------
+3. THE DECISIVE MAP (wettest season != most intense season)
+--------------------------------------------------------------------------
+  decisive share of land, rate   : 71.4%
+  decisive share of land, 1-hour : 62.6%
+  same decisive STATUS           : 89.1%
+  both decisive AND same intense season: 53.0% of land
+
+--------------------------------------------------------------------------
+4. DOES ANY OF THIS TOUCH THE DEBRIS FLOWS?
+--------------------------------------------------------------------------
+  events with both products            : 338
+  same intense season at the event     : 86.1%  (47 differ)
+  decisive under rate / 1-hour / both  : 123 / 103 / 98
+  flow in intense season (decisive set): rate 60.2%  1-hour 57.3%
+  events sitting in bracket-DISAGREEMENT cells: 40 of 338 (12%)
+
+  headline numbers, quoted from the two analysis reports:
+                                       rate        1-hour
+    M2 - M1 log-likelihood            +140.8       +84.7
+    decisive subset                 123 events   103 events
+      flow in intense season           60.2%        57.3%
+      flow in wettest season           12.2%        11.7%
+    regime mean dates              29 Dec / 31 Jul   24 Dec / 31 Jul
+    agreement with 15-min gauges      83.7%        80.3%
+    agreement with 30-min gauges      86.7%        82.8%
+    agreement with 60-min gauges      83.4%        83.2%
+
+--------------------------------------------------------------------------
+5. GROUND TRUTH: real 15- vs 30- vs 60-min duration sensitivity (gauges)
+--------------------------------------------------------------------------
+  15m vs 30m: same dominant season 90.4%  (n=436);  median TVD 0.14;  median |mean date diff| 7 d
+  30m vs 60m: same dominant season 91.5%  (n=436);  median TVD 0.17;  median |mean date diff| 6 d
+  15m vs 60m: same dominant season 87.1%  (n=435);  median TVD 0.21;  median |mean date diff| 9 d
+
+  For contrast, the model bracket (rate vs 1-hour) spans a far wider
+  duration range than 15-to-60 min, so gauge 15m-vs-60m agreement is an
+  UPPER bound on how much a 15-min model product could differ from the
+  1-hour product we already have.
+
+wrote /Users/scottmccoy/Library/CloudStorage/Box-Box/SWMresearch/PostFireDebrisFlows/Seasonality/results/figures/conus404_duration_comparison.png

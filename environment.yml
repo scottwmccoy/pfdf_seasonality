@@ -1,0 +1,36 @@
+# Conda environment for the PFDF seasonality analysis.
+# Versions are those the published results were produced with (PointMan, 2026-09).
+#
+#   conda env create -f environment.yml
+#   conda activate pfdf_seasonality
+#   pip install -e .          # installs this package in editable mode
+#
+# conda-forge only, with strict channel priority, per the machine convention.
+name: pfdf_seasonality
+
+channels:
+  - conda-forge
+
+dependencies:
+  - python=3.10
+  - numpy=2.2
+  - pandas=2.3
+  - scipy=1.15
+  - matplotlib-base=3.10
+  - cycler=0.12
+  - geopandas=1.1
+  - shapely=2.1
+  - rasterio=1.4
+  - pyproj=3.7
+  - gdal=3.10
+  # CONUS404 extraction only - not needed to reproduce the analysis from the
+  # extracted .npz files. Roughly 770 GB of cloud reads if you do re-run it.
+  - xarray=2025.6
+  - zarr=2.18
+  - fsspec=2026.3
+  - s3fs=2026.3
+  # tooling
+  - pytest
+  - pip
+  - pip:
+      - -e .

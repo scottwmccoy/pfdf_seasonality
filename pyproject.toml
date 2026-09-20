@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pfdf_seasonality"
+version = "0.1.0"
+description = "Seasonality of postfire debris flows across the western United States"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "LICENSE" }
+authors = [{ name = "Scott W. McCoy", email = "scottmccoy@unr.edu" }]
+keywords = ["debris flows", "wildfire", "rainfall seasonality", "geomorphology"]
+
+# Pinned to the versions the published results were produced with. The conda
+# environment in environment.yml is the supported way to install these; pip is
+# a fallback, and geopandas/rasterio/gdal are easier through conda-forge.
+dependencies = [
+    "numpy>=2.2",
+    "pandas>=2.3",
+    "scipy>=1.15",
+    "matplotlib>=3.10",
+    "cycler>=0.12",
+    "geopandas>=1.1",
+    "shapely>=2.1",
+    "rasterio>=1.4",
+    "pyproj>=3.7",
+]
+
+[project.optional-dependencies]
+# Only needed to re-extract CONUS404 from the HyTEST cloud store (770 GB of
+# reads); the analysis runs from the extracted .npz files without these.
+extract = ["xarray>=2025.6", "zarr>=2.18", "fsspec>=2026.3", "s3fs>=2026.3"]
+dev = ["pytest>=8"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

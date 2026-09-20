@@ -1,0 +1,108 @@
+349 compiled events; 338 with a trustworthy calendar date
+
+==========================================================================
+MODEL COMPARISON — total log-likelihood of the observed debris-flow months
+==========================================================================
+
+  15m short-duration model, n = 234 events
+    M0 uniform        LL =    -581.5
+    M1 wet-season     LL =    -573.1   (vs uniform: +8.4)
+    M2 short-duration LL =    -502.0   (vs uniform: +79.5)
+    M2 - M1 = +71.1  ->  SHORT-DURATION model wins
+
+  30m short-duration model, n = 234 events
+    M0 uniform        LL =    -581.5
+    M1 wet-season     LL =    -573.1   (vs uniform: +8.4)
+    M2 short-duration LL =    -484.2   (vs uniform: +97.2)
+    M2 - M1 = +88.8  ->  SHORT-DURATION model wins
+
+  60m short-duration model, n = 311 events
+    M0 uniform        LL =    -772.8
+    M1 wet-season     LL =    -724.8   (vs uniform: +48.0)
+    M2 short-duration LL =    -571.7   (vs uniform: +201.1)
+    M2 - M1 = +153.2  ->  SHORT-DURATION model wins
+
+==========================================================================
+DECISIVE SUBSET — events where the two models disagree on the season
+==========================================================================
+
+  15m: 71/234 events where wettest season != most intense 15m season
+    debris flow in the most-intense-15m season :  71.8%
+    debris flow in the wettest season            :   8.5%
+    neither                                      :  19.7%
+    (where the two agree, n=163: 63.8% in that season)
+
+  60m: 87/311 events where wettest season != most intense 60m season
+    debris flow in the most-intense-60m season :  73.6%
+    debris flow in the wettest season            :   8.0%
+    neither                                      :  18.4%
+    (where the two agree, n=224: 63.8% in that season)
+
+==========================================================================
+ROBUSTNESS — is it just 'whichever rainy season arrives first'?
+==========================================================================
+
+  15m: decisive subset with a fire date, n = 60
+    intense season arrives first     n= 30   flows in intense season  63.3%   in wettest  20.0%
+    wettest season arrives first     n= 30   flows in intense season  83.3%   in wettest   0.0%
+
+  60m: decisive subset with a fire date, n = 73
+    intense season arrives first     n= 37   flows in intense season  73.0%   in wettest  18.9%
+    wettest season arrives first     n= 36   flows in intense season  83.3%   in wettest   0.0%
+
+  -> the preference for the intense season survives (indeed strengthens)
+     when the wettest season is the one that arrives first, so it is not
+     an artefact of post-fire susceptibility decay.
+
+==========================================================================
+DEBRIS-FLOW TIMING BY GAUGE-DEFINED RAINFALL REGIME (60-min)
+==========================================================================
+
+  DJF-dominant rainfall  (n = 162 events, CA)
+    mean debris-flow date 27 Dec, concentration R = 0.46, Rayleigh p = 2.2e-16
+    peak months: Jan (38), Feb (29), Dec (25)
+    in the locally most-intense season: 57%
+
+  JJA-dominant rainfall  (n = 148 events, AZ, CA, CO, ID, MT, NM, NV, UT)
+    mean debris-flow date 02 Aug, concentration R = 0.88, Rayleigh p = 1.7e-67
+    peak months: Jul (75), Aug (35), Sep (25)
+    in the locally most-intense season: 78%
+
+  SON-dominant rainfall  (n = 1 events, CA)
+    mean debris-flow date 10 Aug, concentration R = 1.00, Rayleigh p = 4.7e-01
+    peak months: Aug (1)
+    in the locally most-intense season: 0%
+
+  ALL EVENTS (n=338): mean date 29 Aug, R = 0.26, Rayleigh p = 1.1e-10
+    (low R across the whole domain reflects two opposed modes, not aseasonality)
+
+==========================================================================
+FIRE TIMING — is the pattern just 'when fires happen'?
+==========================================================================
+  n = 274 events with a usable fire date
+  fire ignition months: Jun(62), Aug(57), Jul(56), Sep(31)
+  fire -> debris flow lag: median 186 d, quartiles 78-388 d
+  within first year of fire: 72%
+    DJF-dominant: median lag  164 d  (fires peak Aug, flows peak Jan)
+    JJA-dominant: median lag  271 d  (fires peak Jun, flows peak Jul)
+
+==========================================================================
+POOLED MONTH DISTRIBUTION — observed vs model expectation (60-min)
+==========================================================================
+   month  observed   short-duration   wet-season
+    Jan       38           34.0         47.6
+    Feb       29           32.2         49.1
+    Mar        6           19.1         36.9
+    Apr        4           11.0         20.2
+    May        5           11.4         15.7
+    Jun        7           15.2          8.9
+    Jul       88           49.7         19.3
+    Aug       46           48.7         19.5
+    Sep       30           20.5         15.8
+    Oct       14           15.2         19.2
+    Nov       19           27.3         21.3
+    Dec       25           26.6         37.5
+  chi2 vs short-duration  =     59.0  (df=11, p = 1.42e-08)
+  chi2 vs wet-season      =    355.3  (df=11, p = 1.88e-69)
+
+wrote /Users/scottmccoy/Library/CloudStorage/Box-Box/SWMresearch/PostFireDebrisFlows/Seasonality/rainfall_seasonality/compiled/pfdf_events_gauge_seasonality.csv

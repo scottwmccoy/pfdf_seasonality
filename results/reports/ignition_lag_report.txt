@@ -1,0 +1,50 @@
+/Users/scottmccoy/Library/CloudStorage/Box-Box/SWMresearch/PostFireDebrisFlows/Seasonality/rainfall_seasonality/analyze_ignition_lags.py:68: FutureWarning: Downcasting object dtype arrays on .fillna, .ffill, .bfill is deprecated and will change in a future version. Call result.infer_objects(copy=False) instead. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
+  conflict = mtb.notna() & inv_valid & ~ev.mtbs_name_match.fillna(False) \
+/Users/scottmccoy/Library/CloudStorage/Box-Box/SWMresearch/PostFireDebrisFlows/Seasonality/rainfall_seasonality/analyze_ignition_lags.py:80: FutureWarning: Downcasting object dtype arrays on .fillna, .ffill, .bfill is deprecated and will change in a future version. Call result.infer_objects(copy=False) instead. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
+  & ev.int60m_ok.fillna(False).astype(bool))
+==========================================================================
+IGNITION -> FIRST DEBRIS FLOW: the interval and what sets it
+==========================================================================
+usable events: 308 (excluded 39: no ignition date, suspect event date, or no gauge regime)
+ignition source: {'mtbs': 274, 'inventory': 22, 'conflict_latest': 12}
+fires represented: 138  (first-flow-per-fire n = 138)
+
+--- ALL EVENTS ---
+  regime    n  median          IQR  <=180d  180-300  300-730  >730d
+     DJF  159    165d    91-308  d     55%      20%      16%     9%
+     JJA  148    192d    60-411  d     50%       2%      39%     9%
+
+--- FIRST FLOW PER FIRE ---
+  regime    n  median          IQR  <=180d  180-300  300-730  >730d
+     DJF   79    137d    70-206  d     68%      16%      10%     5%
+     JJA   58     75d    43-367  d     60%       3%      28%     9%
+
+--- INTENSE SEASONS SKIPPED BEFORE THE FIRST FLOW (per fire) ---
+k <= 0: flow in the first intense season after ignition
+        k=-1  k=0  k=1  k>=2
+regime                      
+DJF        2   64    9     4
+JJA        2   42    9     5
+SON        0    0    1     0
+  DJF: caught the first intense season 84%   skipped >=1 season 16%   (n=79)
+  JJA: caught the first intense season 76%   skipped >=1 season 24%   (n=58)
+
+--- DOES THE SEASONAL CLOCK, NOT ELAPSED TIME, SET THE DATE? ---
+  DJF: median |observed - clock prediction| = 40 d   (n=159; vs 91 d expected if timing were random in the year)
+  JJA: median |observed - clock prediction| = 20 d   (n=148; vs 91 d expected if timing were random in the year)
+
+--- JJA REGIME: WHICH BURNS CATCH THEIR FIRST MONSOON? (per fire) ---
+branch     first season  skipped  % first season
+ign_month                                       
+1                     0        2               0
+4                     5        0             100
+5                     6        1              86
+6                    14        8              64
+7                    11        1              92
+8                     8        0             100
+9                     0        2               0
+
+--- MTBS vs inventory validation (matched events with both) ---
+  n = 232, median |delta| = 0 d, within 7 d: 92%
+
+wrote /Users/scottmccoy/Library/CloudStorage/Box-Box/SWMresearch/PostFireDebrisFlows/Seasonality/rainfall_seasonality/compiled/pfdf_events_ignition_lags.csv

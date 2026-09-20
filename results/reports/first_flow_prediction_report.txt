@@ -1,0 +1,37 @@
+==========================================================================
+PREDICTING THE FIRST DEBRIS FLOW FROM PRE-FIRE CLIMATOLOGY ALONE
+==========================================================================
+first flow per fire, n = 137 (DJF 79, JJA 58); forecasts use only Atlas 14 climatology + ignition date
+
+--- point forecast: first-opportunity clock date ---
+                                      DJF          JJA       pooled
+       median |error|, clock          47d          29d          41d
+median |error|, const-lag fit          68d          50d          67d
+     % within +/-45 d, clock          47%          66%          55%
+ % within +/-45 d, const fit          30%          47%          37%
+
+--- two-branch forecast (nearest of first season / one later) ---
+  DJF: P(first season) = 84%;  nearest-branch median |error| 46 d;  within +/-45 d of a branch: 48%
+  JJA: P(first season) = 76%;  nearest-branch median |error| 23 d;  within +/-45 d of a branch: 84%
+
+--- a priori seasonal-window forecast ---
+  DJF: window width median 5 mo (42% of the year); first-window coverage 66%; first-or-second 71%
+  JJA: window width median 3 mo (25% of the year); first-window coverage 53%; first-or-second 72%
+
+--- operational lookup: ignition month -> median wait (days) ---
+ regime  ign mo    n  predicted  observed  P(1st season)
+    DJF       5    6       253d      256d            67%
+    DJF       6    6       206d      192d           100%
+    DJF       7   19       170d      153d            79%
+    DJF       8   15       143d      149d           100%
+    DJF       9   16       113d      102d            75%
+    DJF      10   10        85d       62d            90%
+    DJF      11    3        73d      110d            67%
+    DJF      12    3        43d       53d            67%
+    JJA       4    5       102d       83d           100%
+    JJA       5    7        82d       64d            86%
+    JJA       6   22        49d       55d            64%
+    JJA       7   12        37d       61d            92%
+    JJA       8    8       322d      327d           100%
+
+wrote /Users/scottmccoy/Library/CloudStorage/Box-Box/SWMresearch/PostFireDebrisFlows/Seasonality/rainfall_seasonality/compiled/first_flow_prediction.png
