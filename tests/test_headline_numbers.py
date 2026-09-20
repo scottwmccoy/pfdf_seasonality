@@ -250,7 +250,8 @@ def test_no_event_is_silently_survey_dated():
     assert "date_basis" in ev.columns and "survey_dated" in ev.columns, (
         "the compilation must record what each event's date means")
     flagged = ev.date_basis.fillna("").str.contains("observation")
-    assert (ev.survey_dated.fillna(False).astype(bool) == flagged).all(), (
+    flagged_actual = ev.survey_dated.astype("boolean").fillna(False).astype(bool)
+    assert (flagged_actual == flagged).all(), (
         "survey_dated disagrees with date_basis")
     # Dolan specifically: one storm, not four survey dates
     dolan = ev[ev.fire_key.astype(str).str.contains("dolan", case=False, na=False)]
