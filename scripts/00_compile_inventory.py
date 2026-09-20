@@ -87,34 +87,49 @@ SOURCE_META = {
         doi="10.5066/P13ZFKJS",
         data_doi="10.5066/P13ZFKJS",
     ),
+    # Author lists verified against the Zotero libraries 2026-09-20, by locating
+    # each DOI in the reference list of a citing paper; the Oregon release was
+    # confirmed against the README distributed with the data. The five entries
+    # below previously read "USGS, <year>" or "and others" - placeholders rather
+    # than fabrications, but wrong to carry into a manuscript.
     "volumes227": dict(
-        citation="USGS, 2025, Inventory of 227 postfire debris-flow volumes for 34 fires "
+        citation="Gorr, A.N., Rengers, F.K., Barnhart, K.R., Thomas, M.A., Kean, J.W., "
+        "Crowder, C.A., 2025, Inventory of 227 postfire debris-flow volumes for 34 fires "
         "in the western United States: USGS data release",
         doi="10.5066/P13EZSWW",
         data_doi="10.5066/P13EZSWW",
     ),
     "czu2021": dict(
-        citation="Thomas, M.A., and others, 2023, Field-verified inventory of postfire hydrologic "
-        "response for the 2020 CZU Lightning Complex, River, Camel, and Dolan Fires "
-        "(26-29 Jan 2021 AR sequence): USGS data release",
+        citation="Thomas, M.A., Lindsay, D.N., Kostelnik, J., Rengers, F.K., East, A.E., "
+        "Schwartz, J.Y., Smith, D., Collins, B.D., 2023, Field-verified inventory of "
+        "post-fire hydrologic response for the 2020 CZU Lightning Complex, River, Camel, "
+        "and Dolan fires following a 26-29 January 2021 atmospheric river storm sequence: "
+        "USGS data release",
         doi="10.5066/P91O03Y7",
         data_doi="10.5066/P91O03Y7",
     ),
     "dixie2023": dict(
-        citation="USGS, 2023, Field-verified inventory of postfire debris flows for the 2021 "
-        "Dixie Fire: USGS data release",
+        citation="Thomas, M.A., Lindsay, D.N., Cavagnaro, D.B., Kean, J.W., McCoy, S.W., "
+        "Graber, A.P., 2023, Field-verified inventory of post-fire debris flows for the "
+        "2021 Dixie Fire following a 23-25 October 2021 atmospheric river storm and "
+        "12 June 2022 thunderstorm: USGS data release",
         doi="10.5066/P9YPX1BM",
         data_doi="10.5066/P9YPX1BM",
     ),
     "dolan2020": dict(
-        citation="USGS, 2025, Inventory of fluvial erosion and debris-flow activity following "
-        "the 2020 Dolan Fire, California: USGS data release",
+        citation="Cavagnaro, D.B., McCoy, S.W., Thomas, M.A., Kostelnik, J., Lindsay, D.N., "
+        "2025, Inventory of fluvial erosion and debris-flow activity following the 2020 "
+        "Dolan Fire, California: USGS data release",
         doi="10.5066/P13ZGR6F",
         data_doi="10.5066/P13ZGR6F",
     ),
     "oregon2024": dict(
-        citation="USGS, 2024, Inventory of debris flows in burned (2020-2022) and unburned "
-        "(1995-2020) areas in the western Cascade Range of Oregon: USGS data release",
+        # Title per the README shipped with the data ("western Cascades of Oregon");
+        # Selander et al. (2025, ESP) cite it as "western Cascade Range of Oregon".
+        citation="Selander, B., Calhoun, N., Burns, W., Rengers, F., Kean, J., Moffett, K., "
+        "Patton, A., Quinn, D., Roering, J., 2024, Inventory of debris flows in burned "
+        "(2020-2022) and unburned (1995-2020) areas in the western Cascades of Oregon: "
+        "USGS data release",
         doi="10.5066/P13TPP8J",
         data_doi="10.5066/P13TPP8J",
     ),
