@@ -6,13 +6,12 @@ for data, so moving any file broke its siblings. Import from here instead.
 
 Two trees
 ---------
-**This repository** holds code and the generated text reports. Reports are
-small and are the provenance record for every number in the manuscript, so
-they are committed and their diffs show when a result moved.
+**This repository** holds code only.
 
-**The Box tree** holds the bulk data (1.6 GB of CONUS404 alone), the generated
-figures, and the manuscripts. It is not in git. Point ``PFDF_SEASONALITY_DATA``
-at it if it is not in the default location::
+**The Box tree** holds everything else: the bulk data (1.6 GB of CONUS404
+alone), every generated output under ``results/`` (``figures/`` and
+``reports/`` side by side), and the manuscripts. It is not in git. Point
+``PFDF_SEASONALITY_DATA`` at it if it is not in the default location::
 
     export PFDF_SEASONALITY_DATA="$HOME/Library/CloudStorage/Box-Box/SWMresearch/PostFireDebrisFlows/Seasonality"
 
@@ -35,7 +34,6 @@ __all__ = [
 # --------------------------------------------------------------- repository
 # paths.py -> pfdf_seasonality -> src -> repo root
 REPO = Path(__file__).resolve().parents[2]
-REPORTS = REPO / "results" / "reports"
 
 # ------------------------------------------------------------- the data tree
 _DEFAULT_DATA = (Path.home() / "Library/CloudStorage/Box-Box/SWMresearch"
@@ -45,7 +43,9 @@ DATA = Path(os.environ.get("PFDF_SEASONALITY_DATA", _DEFAULT_DATA)).expanduser()
 RAW = DATA / "data" / "raw"
 PROCESSED = DATA / "data" / "processed"
 LOGS = DATA / "data" / "logs"
+# generated outputs, side by side
 FIGURES = DATA / "results" / "figures"
+REPORTS = DATA / "results" / "reports"
 MANUSCRIPTS = DATA / "manuscripts"
 
 # raw inputs, never written by analysis code

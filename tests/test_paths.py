@@ -14,7 +14,14 @@ from pfdf_seasonality import paths
 
 def test_repo_root_is_the_repository():
     assert (paths.REPO / "pyproject.toml").exists()
-    assert paths.REPORTS == paths.REPO / "results" / "reports"
+
+
+def test_generated_outputs_live_together_in_the_data_tree():
+    """Figures and reports are siblings under DATA, and neither is in the repo."""
+    assert paths.FIGURES == paths.DATA / "results" / "figures"
+    assert paths.REPORTS == paths.DATA / "results" / "reports"
+    assert paths.FIGURES.parent == paths.REPORTS.parent
+    assert paths.REPO not in paths.REPORTS.parents
 
 
 def test_data_root_honours_the_environment(monkeypatch, tmp_path):
@@ -24,6 +31,10 @@ def test_data_root_honours_the_environment(monkeypatch, tmp_path):
     try:
         assert reloaded.DATA == tmp_path
         assert reloaded.RAW == tmp_path / "data" / "raw"
+        # outputs follow the data root, so pointing at a scratch tree
+        # redirects reports and figures too
+        assert reloaded.REPORTS == tmp_path / "results" / "reports"
+        assert reloaded.FIGURES == tmp_path / "results" / "figures"
     finally:
         monkeypatch.delenv("PFDF_SEASONALITY_DATA", raising=False)
         importlib.reload(paths)

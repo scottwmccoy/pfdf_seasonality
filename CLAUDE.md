@@ -36,14 +36,19 @@ ability to move either tree.
 `python -m pfdf_seasonality.paths` prints every resolved root and flags any
 that is missing — the first thing to run when a path looks wrong.
 
-Outputs are routed by kind, and this split is deliberate:
+**This repository is code only.** Nothing generated is committed; every output
+goes to the Box tree:
 
-| Kind | Goes to | In git? |
-|---|---|---|
-| Text reports | `REPORTS` (repo `results/reports/`) | **yes** — they are the number-provenance record |
-| Figures | `FIGURES` (Box `results/figures/`) | no — binary and regenerable |
-| Analysis-ready tables | `PROCESSED` (Box `data/processed/`) | no |
-| Raw inputs | `RAW` (Box `data/raw/`) | no — never written by code |
+| Kind | Goes to |
+|---|---|
+| Text reports | `REPORTS` — Box `results/reports/` |
+| Figures | `FIGURES` — Box `results/figures/` |
+| Analysis-ready tables | `PROCESSED` — Box `data/processed/` |
+| Raw inputs | `RAW` — Box `data/raw/`, never written by code |
+
+Figures and reports are siblings under `results/` on purpose, and there is
+exactly one of each directory. A second copy of a figure or report beside a
+manuscript goes stale the first time a script is re-run.
 
 ## Gotchas
 

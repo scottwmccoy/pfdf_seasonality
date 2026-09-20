@@ -1,10 +1,8 @@
-# Bulk data and generated figures live in the Box tree, never here.
+# This repository is code only. Data and every generated output - figures and
+# text reports alike - live in the Box tree under $PFDF_SEASONALITY_DATA.
 # See src/pfdf_seasonality/paths.py.
 data/
-results/figures/
-
-# Generated text reports ARE committed (results/reports/) - they are small and
-# they are the provenance record for every number in the manuscript.
+results/
 
 # Python
 __pycache__/

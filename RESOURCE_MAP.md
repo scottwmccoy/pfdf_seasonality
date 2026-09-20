@@ -38,16 +38,14 @@ What every file in both trees is. Updated 2026-09-20, at the reorganization.
 | `plots/*.py` | Five figure scripts, all writing to the Box `results/figures/` |
 | `rerun_when_hourly_done.sh` | One-off watcher from the original extraction run; kept for reference |
 
-### `results/reports/` — committed
+### `tests/`
 
-Eight generated text reports. These are the provenance record for every number
-in the manuscript; their diffs show when a result moved.
+`test_seasons.py` guards the consolidated constants and helpers, including the
+365.0-day pin on `circular_mean_doy`. `test_paths.py` guards the layout and
+fails if a script reintroduces `Path(__file__)` or a literal redefinition of a
+shared constant.
 
-`analysis_report.txt` (core seasonality) · `ignition_lag_report.txt` ·
-`first_flow_prediction_report.txt` · `seasonality_product_evaluation_report.txt` ·
-`conus404_analysis_report.txt` · `conus404_hourly_analysis_report.txt` ·
-`conus404_duration_comparison_report.txt` · `duration_sensitivity_report.txt` ·
-`compilation_report.txt` (written by `00_`, lands here on the next run)
+Nothing generated is committed here — see the Box tree below.
 
 ---
 
@@ -77,7 +75,20 @@ in the manuscript; their diffs show when a result moved.
 
 Extraction logs from the CONUS404 and Atlas 14 runs.
 
-### `results/figures/` — the only figures directory
+### `results/` — every generated output, figures and reports side by side
+
+#### `results/reports/`
+
+Nine generated text reports, the provenance record for every number in the
+manuscript. If a number is not in one of these, it is not ready to quote.
+
+`analysis_report.txt` (core seasonality) · `ignition_lag_report.txt` ·
+`first_flow_prediction_report.txt` · `seasonality_product_evaluation_report.txt` ·
+`conus404_analysis_report.txt` · `conus404_hourly_analysis_report.txt` ·
+`conus404_duration_comparison_report.txt` · `duration_sensitivity_report.txt` ·
+`compilation_report.txt`
+
+#### `results/figures/` — the only figures directory
 
 Eight generated PNGs, written here by `scripts/plots/` and by `24_`/`25_`.
 `pfdf_seasonality_gauge_story.png` is the core result; `ignition_lag.png` and

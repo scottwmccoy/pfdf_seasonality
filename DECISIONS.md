@@ -71,13 +71,19 @@ See `results/reports/seasonality_product_evaluation_report.txt`.
 
 ## 2026-09-20 — Repository split from the data tree
 
-Code and generated text reports moved to this git repository; bulk data,
-figures and manuscripts stayed in Box, connected by `$PFDF_SEASONALITY_DATA`
-and `paths.py`. This mirrors `hma-gof`, keeps 1.6 GB of `.npz` out of git, and
+Code moved to this git repository; bulk data, generated outputs and
+manuscripts stayed in Box, connected by `$PFDF_SEASONALITY_DATA` and
+`paths.py`. This mirrors `hma-gof`, keeps 1.6 GB of `.npz` out of git, and
 avoids running git inside a cloud-sync folder.
 
-Reports are committed but figures are not: reports are small text whose diffs
-show when a number moved, figures are binary and regenerable.
+Reports were initially committed to the repository, on the argument that their
+diffs show when a number moved. **Reversed the same week**: the repository is
+now code only, and `results/figures/` and `results/reports/` sit side by side
+in Box. Splitting generated outputs across two trees meant the manuscripts —
+which live in Box and cite both — had to reach into the repository for half
+of what they referenced, and one directory of outputs is easier to reason
+about than two. Provenance is served by the reports being regenerable from
+committed code against immutable inputs, not by their being versioned.
 
 **Verification standard set here.** The migration replaced per-script path
 boilerplate in 18 files and consolidated constants duplicated in up to 12, then

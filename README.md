@@ -14,19 +14,21 @@ Supports the AGU Fall Meeting 2026 abstract and the manuscript in preparation.
 
 ## Two trees
 
-Code and generated text reports live here. Bulk data (1.6 GB of CONUS404
-alone), generated figures, and the manuscripts live in Box:
+This repository is code only. Everything it reads and everything it writes —
+bulk data, generated figures, generated reports, and the manuscripts — lives in
+Box:
 
 ```
 ~/git/code/pfdf_seasonality/          this repository
     src/pfdf_seasonality/             importable package
     scripts/                          ordered pipeline
-    results/reports/                  generated .txt, committed
+    tests/
 
 $PFDF_SEASONALITY_DATA/               the Box tree
     data/raw/                         immutable inputs
     data/processed/                   analysis-ready tables
     results/figures/                  generated .png
+    results/reports/                  generated .txt
     manuscripts/                      abstract and paper draft
 ```
 
