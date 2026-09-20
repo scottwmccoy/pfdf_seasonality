@@ -85,6 +85,18 @@ of what they referenced, and one directory of outputs is easier to reason
 about than two. Provenance is served by the reports being regenerable from
 committed code against immutable inputs, not by their being versioned.
 
+**Manuscripts are deliberately not in git** (decided 2026-09-20). The drafts
+live in Box and are edited there, so they stay synced across devices; their
+version history is whatever Box provides natively, and there are no commit
+messages or line-level diffs for prose. This was weighed against moving
+`manuscripts/` into this repository — 84 KB of markdown, which would have
+given proper diffs — and the workflow cost of editing the paper outside Box
+decided it. Do not "fix" this by adding the manuscripts here without asking.
+
+A consequence worth knowing: manuscript edits produce nothing to commit. If a
+session changes only the draft or the abstract, `git status` in this repo will
+be clean, and that is correct rather than a mistake.
+
 **Verification standard set here.** The migration replaced per-script path
 boilerplate in 18 files and consolidated constants duplicated in up to 12, then
 re-ran every affected script and diffed all 29 outputs byte-for-byte against

@@ -50,6 +50,13 @@ Figures and reports are siblings under `results/` on purpose, and there is
 exactly one of each directory. A second copy of a figure or report beside a
 manuscript goes stale the first time a script is re-run.
 
+**The manuscripts are in Box and are not in git, by decision** — see
+`DECISIONS.md`. So a session that edits only the draft or the abstract will
+leave `git status` clean here, and there will be nothing to commit. That is the
+expected outcome, not a missed step. Say so plainly rather than committing
+something unrelated to create the appearance of progress, and do not move the
+manuscripts into this repository without asking.
+
 ## Gotchas
 
 **1. Box lies about file size.** Files in the Box tree report 0 blocks to `du`
