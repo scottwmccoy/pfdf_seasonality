@@ -77,20 +77,40 @@ in the manuscript; their diffs show when a result moved.
 
 Extraction logs from the CONUS404 and Atlas 14 runs.
 
-### `results/figures/`
+### `results/figures/` — the only figures directory
 
-Eight generated PNGs. `pfdf_seasonality_gauge_story.png` is the core result;
-`ignition_lag.png` and `first_flow_prediction.png` are the timing results;
+Eight generated PNGs, written here by `scripts/plots/` and by `24_`/`25_`.
+`pfdf_seasonality_gauge_story.png` is the core result; `ignition_lag.png` and
+`first_flow_prediction.png` are the timing results;
 `seasonality_product_evaluation.png` is the product comparison;
 `atlas14_station_seasonality_map.png` and `atlas14_seasonality_grid_map.png`
 are the climatology; `gauge_vs_conus404.png` and
 `conus404_duration_comparison.png` are the reanalysis comparisons.
 
+**Figures live here and nowhere else.** The manuscripts link to them rather
+than holding copies: a second copy beside a draft goes stale the first time a
+script is re-run, and the stale one is what ends up in the submission. Vector
+exports for submission are a build step into a throwaway directory, not a
+tracked folder.
+
+Which script writes which figure:
+
+| Figure | Script |
+|---|---|
+| `atlas14_station_seasonality_map.png` | `plots/plot_station_seasonality.py` |
+| `atlas14_seasonality_grid_map.png` | `plots/plot_atlas14_grid.py` |
+| `pfdf_seasonality_gauge_story.png` | `plots/plot_seasonality_story.py` |
+| `ignition_lag.png` | `plots/plot_ignition_lags.py` |
+| `first_flow_prediction.png` | `12_predict_first_flow.py` |
+| `gauge_vs_conus404.png` | `plots/plot_gauge_vs_conus404.py` |
+| `conus404_duration_comparison.png` | `24_compare_conus404_durations.py` |
+| `seasonality_product_evaluation.png` | `25_evaluate_products.py` |
+
 ### `manuscripts/`
 
 - `agu_2026_abstract/abstract.md` — submitted and published; frozen record
-- `seasonality_paper/draft.md` — the working paper draft
-- `seasonality_paper/figures/`, `refs/` — manuscript-ready exports, references
+- `seasonality_paper/draft.md` — the working paper draft, which links to
+  `results/figures/` and to the committed reports rather than copying either
 
 ### `docs/`
 
