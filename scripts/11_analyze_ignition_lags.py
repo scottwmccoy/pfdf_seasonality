@@ -54,7 +54,10 @@ def main():
     gz = pd.read_csv(GAUGE)
     cols = ["event_id", "int60m_ok", "int60m_season"] + \
            [f"int60m_p{m:02d}" for m in range(1, 13)]
-    ev = mt.merge(gz[cols], on="event_id", how="left")
+    # INNER, not left: the gauge file carries only events inside the post-fire
+    # window (see pfdf_seasonality.events), and a left join here would quietly
+    # re-admit the ones the window excluded.
+    ev = mt.merge(gz[cols], on="event_id", how="inner")
 
     # ---------------------------------------------- choose the ignition date
     inv, mtb = ev.fire_start_date, ev.mtbs_ig_date

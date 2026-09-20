@@ -32,6 +32,7 @@ from scipy.stats import chi2
 from pfdf_seasonality.paths import PROCESSED, REPORTS, EVENTS
 from pfdf_seasonality.seasons import SEASONS, MONTH_TO_SEASON, EPS, LAT0, normalize, to_xy, circular, season_of, doy_to_date
 from pfdf_seasonality.report import tee
+from pfdf_seasonality.events import load_events
 
 OUT = PROCESSED / "seasonality"
 OUT.mkdir(exist_ok=True)
@@ -60,7 +61,7 @@ def idw(points, src, cols):
 
 def main():
     # ---------------------------------------------------------------- events
-    ev = pd.read_csv(EVENTS, parse_dates=["event_date"])
+    ev = load_events()
     n_all = len(ev)
     ev = ev[~ev.date_precision.astype(str).str.startswith("suspect")].copy()
     print(f"{n_all} compiled events; {len(ev)} with a trustworthy calendar date")

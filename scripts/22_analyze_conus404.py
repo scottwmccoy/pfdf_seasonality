@@ -29,6 +29,7 @@ from scipy.stats import chi2
 from pfdf_seasonality.paths import CONUS404, PROCESSED, REPORTS, EVENTS
 from pfdf_seasonality.seasons import SEASONS, MONTH_TO_SEASON, EPS, LAT0, normalize, to_xy, circular, season_of, doy_to_date
 from pfdf_seasonality.report import tee
+from pfdf_seasonality.events import load_events
 
 C404 = CONUS404
 OUT = PROCESSED / "seasonality"
@@ -125,7 +126,7 @@ def main(source: str = "rate"):
     print(f"CONUS404 intensity metric: {label}\n")
 
     # ------------------------------------------------------------------ events
-    ev = pd.read_csv(EVENTS, parse_dates=["event_date"])
+    ev = load_events()
     ev = ev[~ev.date_precision.astype(str).str.startswith("suspect")].copy()
     ev["df_month"] = ev.event_date.dt.month
     ev["df_doy"] = ev.event_date.dt.dayofyear
