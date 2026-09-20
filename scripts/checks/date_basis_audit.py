@@ -111,11 +111,21 @@ def main() -> None:
             flag = "  <-- investigate" if r["median"] > 14 else ""
             print(f"  {r.a:16s} {r.b:16s} {r.fires:6d} {r['median']:10.0f}d "
                   f"{r.worst:6.0f}d{flag}")
-        print("\n  A large gap is not automatically an error: one fire can produce")
-        print("  debris flows in several storms, each documented by a different")
-        print("  source. It means the two sources share no common date, which is")
-        print("  worth a look. cavagnaro2025 vs graber2024 (median 552 d over 2")
-        print("  fires) is the strongest such case and has not been run down.")
+        print("\n  READ THIS COLUMN CAREFULLY. A large gap is NOT evidence of an")
+        print("  error, and this signal is the weakest of the four. It measures")
+        print("  only that two sources share no common date at a fire, which is")
+        print("  the normal outcome when a burn scar produces flows in several")
+        print("  seasons and each source documents different ones.")
+        print()
+        print("  Worked example, run down 2026-09-20: cavagnaro2025 vs graber2024")
+        print("  flagged at a median 552 d over two fires. Both are real.")
+        print("    Cameron Peak (CO, 2020 fire): flows in Jul 2021, Jul 2022 and")
+        print("      Jul 2023 - three monsoon seasons, four sources between them;")
+        print("      cavagnaro holds 2021, graber2024 holds 2023, and graber2023")
+        print("      and volumes227 bridge the gap.")
+        print("    Dixie (CA, 2021 fire): Oct 2021, Jun 2022, Jun 2023. The Dixie")
+        print("      data release names two of them in its own title.")
+        print("  Use this signal to pick candidates, never to conclude.")
     else:
         print("  (no fire is described by more than one source)")
 
@@ -145,6 +155,31 @@ def main() -> None:
         print("\n  chance = 1/12 = 0.083")
     else:
         print("  (monthly climatology columns not present; run 05_join first)")
+
+    # ---------------------------------------------------------------- 5
+    print("\n" + "-" * 76)
+    print("5. CHRONOLOGY — can the flow date follow the fire at all?")
+    print("-" * 76)
+    print("  Unambiguous, unlike the signals above: a flow cannot precede its")
+    print("  own fire, and a lag of decades is a data-entry error somewhere.")
+    b = rec.dropna(subset=["fire_start_date", "event_date"]).copy()
+    b["lag"] = (b.event_date - b.fire_start_date).dt.days
+    before = b[b.lag < 0]
+    late = b[b.lag > 1826]
+    print(f"\n  records with a fire date : {len(b)}")
+    print(f"  flow BEFORE its own fire : {len(before)}"
+          + (f"  -> {before.groupby('source_key').size().to_dict()}" if len(before) else ""))
+    print(f"  flow >5 years after fire : {len(late)}"
+          + (f"  -> {late.groupby('source_key').size().to_dict()}" if len(late) else ""))
+    for _, r_ in before.iterrows():
+        print(f"    IMPOSSIBLE  {r_.record_id}  fire {r_.fire_start_date:%Y-%m-%d} -> "
+              f"flow {r_.event_date:%Y-%m-%d}  ({r_.lag:,} d)")
+    if len(before):
+        print("\n  Known case, upstream not ours: literature EventID 61 carries")
+        print("  DateFireStart 13-Sep-2013 with DateOfFlow 1914, sourced to Eaton")
+        print("  (1935). A 1913 fire mis-entered as 2013 fits every other field.")
+        print("  It does not reach the results: the analysis keys on flow date,")
+        print("  and the lag analysis drops it.")
 
     # ---------------------------------------------------------------- verdict
     print("\n" + "=" * 76)
