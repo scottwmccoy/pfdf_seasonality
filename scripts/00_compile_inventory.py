@@ -18,8 +18,12 @@ Added from literature/data-repository search:
   czu2021        USGS 10.5066/P91O03Y7  (CZU/River/Camel/Dolan, Jan-2021 AR sequence)
   dixie2023      USGS 10.5066/P9YPX1BM  (2021 Dixie Fire)
   dolan2020      USGS 10.5066/P13ZGR6F  (2020 Dolan Fire, segment-scale)
-  oregon2024     USGS 10.5066/P13TPP8J  (W. Cascades OR, burned 2020-2022)
-  literature     USGS 10.5066/P13STASQ  (McGuire et al. 2024, literature-derived, global)
+  oregon2024     USGS 10.5066/P13TPP8J  (W. Cascade Range OR; burned + unburned,
+                 we keep only the 28 field visits recording a debris-flow response)
+  literature     USGS 10.5066/P13STASQ  (McGuire et al. 2024, literature-derived)
+
+Full citations, verified against each DOI's ScienceBase landing page, are in
+SOURCE_META below. Do not take them from a citing paper's reference list.
 
 Run:
   /opt/anaconda3/envs/PointMan/bin/python compile_pfdf_occurrence.py
@@ -87,54 +91,58 @@ SOURCE_META = {
         doi="10.5066/P13ZFKJS",
         data_doi="10.5066/P13ZFKJS",
     ),
-    # Author lists verified against the Zotero libraries 2026-09-20, by locating
-    # each DOI in the reference list of a citing paper; the Oregon release was
-    # confirmed against the README distributed with the data. The five entries
-    # below previously read "USGS, <year>" or "and others" - placeholders rather
-    # than fabrications, but wrong to carry into a manuscript.
+    # Citations verified 2026-09-20 against the authoritative ScienceBase landing
+    # page for each DOI (doi.org -> sciencebase.gov/catalog/item/...). An earlier
+    # pass took them from citing papers' reference lists and from a README shipped
+    # with the data; both proved unreliable in detail. Reference lists abbreviate
+    # (the CZU release lost three of its eleven authors that way, including
+    # McCoy), and the Oregon README's title differs from the published one.
+    # Use the landing page, not a secondary citation.
     "volumes227": dict(
         citation="Gorr, A.N., Rengers, F.K., Barnhart, K.R., Thomas, M.A., Kean, J.W., "
-        "Crowder, C.A., 2025, Inventory of 227 postfire debris-flow volumes for 34 fires "
+        "and Crowder, C.A., 2025, Inventory of 227 postfire debris-flow volumes for 34 fires "
         "in the western United States: USGS data release",
         doi="10.5066/P13EZSWW",
         data_doi="10.5066/P13EZSWW",
     ),
     "czu2021": dict(
-        citation="Thomas, M.A., Lindsay, D.N., Kostelnik, J., Rengers, F.K., East, A.E., "
-        "Schwartz, J.Y., Smith, D., Collins, B.D., 2023, Field-verified inventory of "
-        "post-fire hydrologic response for the 2020 CZU Lightning Complex, River, Camel, "
-        "and Dolan fires following a 26-29 January 2021 atmospheric river storm sequence: "
-        "USGS data release",
+        # 11 authors per ScienceBase; a citing paper's reference list showed only 8,
+        # dropping Kean, McCoy and Cavagnaro.
+        citation="Thomas, M.A., Kean, J.W., McCoy, S.W., Lindsay, D.N., Kostelnik, J., "
+        "Cavagnaro, D.B., Rengers, F.K., East, A.E., Schwartz, J.Y., Smith, D., and "
+        "Collins, B.D., 2023, Field-verified inventory of postfire hydrologic response "
+        "for the 2020 CZU Lightning Complex, River, Camel, and Dolan Fires following a "
+        "26-29 January 2021 atmospheric river storm sequence: USGS data release",
         doi="10.5066/P91O03Y7",
         data_doi="10.5066/P91O03Y7",
     ),
     "dixie2023": dict(
         citation="Thomas, M.A., Lindsay, D.N., Cavagnaro, D.B., Kean, J.W., McCoy, S.W., "
-        "Graber, A.P., 2023, Field-verified inventory of post-fire debris flows for the "
+        "and Graber, A.P., 2023, Field-verified inventory of postfire debris flows for the "
         "2021 Dixie Fire following a 23-25 October 2021 atmospheric river storm and "
         "12 June 2022 thunderstorm: USGS data release",
         doi="10.5066/P9YPX1BM",
         data_doi="10.5066/P9YPX1BM",
     ),
     "dolan2020": dict(
-        citation="Cavagnaro, D.B., McCoy, S.W., Thomas, M.A., Kostelnik, J., Lindsay, D.N., "
-        "2025, Inventory of fluvial erosion and debris-flow activity following the 2020 "
-        "Dolan Fire, California: USGS data release",
+        citation="Cavagnaro, D.B., McCoy, S.W., Thomas, M.A., Kostelnik, J., and "
+        "Lindsay, D.N., 2025, Inventory of fluvial erosion and debris-flow activity "
+        "following the 2020 Dolan Fire, California: USGS data release",
         doi="10.5066/P13ZGR6F",
         data_doi="10.5066/P13ZGR6F",
     ),
     "oregon2024": dict(
-        # Title per the README shipped with the data ("western Cascades of Oregon");
-        # Selander et al. (2025, ESP) cite it as "western Cascade Range of Oregon".
-        citation="Selander, B., Calhoun, N., Burns, W., Rengers, F., Kean, J., Moffett, K., "
-        "Patton, A., Quinn, D., Roering, J., 2024, Inventory of debris flows in burned "
-        "(2020-2022) and unburned (1995-2020) areas in the western Cascades of Oregon: "
-        "USGS data release",
+        # "Cascade Range", not "Cascades" (the shipped README says the latter), and
+        # the authors carry middle initials the README omits.
+        citation="Selander, B.D., Calhoun, N.C., Burns, W.J., Rengers, F.K., Kean, J.W., "
+        "Moffett, K.B., Patton, A.I., Quinn, D.S., and Roering, J.J., 2024, Inventory of "
+        "debris flows in burned (2020-2022) and unburned (1995-2020) areas in the western "
+        "Cascade Range of Oregon: USGS data release",
         doi="10.5066/P13TPP8J",
         data_doi="10.5066/P13TPP8J",
     ),
     "literature": dict(
-        citation="McGuire, L.A., Ebel, B.A., Rengers, F.K., Vieira, D.C.S., Nyman, P., 2024, "
+        citation="McGuire, L.A., Ebel, B.A., Rengers, F.K., Vieira, D.C.S., and Nyman, P., 2024, "
         "Postfire Debris-Flow Database (Literature Derived): USGS data release",
         doi="10.5066/P13STASQ",
         data_doi="10.5066/P13STASQ",
