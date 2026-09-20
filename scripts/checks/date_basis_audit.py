@@ -181,6 +181,38 @@ def main() -> None:
         print("  It does not reach the results: the analysis keys on flow date,")
         print("  and the lag analysis drops it.")
 
+    if len(late):
+        print("\n  The long lags are NOT errors, with one exception. Every one is")
+        print("  LANDSLIDE-initiated, and landslide susceptibility after fire")
+        print("  peaks years later through root decay, where runoff-generated")
+        print("  susceptibility peaks in the first wet season. Checked 2026-09-20:")
+        print("    litevent327/326  CA San Gabriels, 1960 fire -> 1965 and 1969")
+        print("                     (Rice & Foggin 1971; the Jan 1969 storms)")
+        print("    litevent325      Boise NF, 1989 fire -> 1997 New Year flood")
+        print("                     (Shaub 2001, 'Landslides and wildfire')")
+        print("    litevent342      1987 fire -> Jan 1997; MTBS finds a 1996 fire")
+        print("                     here and the lag analysis already re-dates it")
+        print("    litevent346      1973 fire -> 1995 flow, cited to Gray (1981).")
+        print("                     IMPOSSIBLE: the reference predates the flow by")
+        print("                     14 years. A genuine upstream error.")
+
+    # ----------------------------------------------- initiation sensitivity
+    print("\n" + "-" * 76)
+    print("6. PROCESS MIXING — are landslide-initiated flows in the analysis?")
+    print("-" * 76)
+    ls = ev.initiation_class.astype(str).str.contains("landslide", na=False)
+    print(f"  events involving landslide initiation: {int(ls.sum())} of {len(ev)}")
+    print(f"  their months: {sorted(ev[ls].event_date.dt.month.tolist())}")
+    print("\n  They skew hard to the wet season, which is what a saturation-driven")
+    print("  process should do. No analysis script filters on initiation_class, so")
+    print("  they are in the results. That is CONSERVATIVE for this paper's claim:")
+    print("  a saturation process dilutes an intensity signal rather than creating")
+    print("  one. Measured on the 60-min gauge analysis, excluding them moves the")
+    print("  decisive subset from 73.6% to 74.4% intense (8.0% to 8.1% wettest,")
+    print("  ratio 9.1:1 either way) and the winter mean date from 25 to 24 Dec.")
+    print("  The paper should say it includes them and that excluding them does")
+    print("  not change the answer, rather than quietly dropping them.")
+
     # ---------------------------------------------------------------- verdict
     print("\n" + "=" * 76)
     print("VERDICT")
