@@ -40,10 +40,25 @@ What every file in both trees is. Updated 2026-09-20, at the reorganization.
 
 ### `tests/`
 
-`test_seasons.py` guards the consolidated constants and helpers, including the
-365.0-day pin on `circular_mean_doy`. `test_paths.py` guards the layout and
-fails if a script reintroduces `Path(__file__)` or a literal redefinition of a
-shared constant.
+| File | Guards |
+|---|---|
+| `test_seasons.py` | The consolidated constants and helpers, including the 365.0-day pin on `circular_mean_doy` |
+| `test_paths.py` | The layout; fails if a script reintroduces `Path(__file__)` or a literal redefinition of a shared constant |
+| `test_headline_numbers.py` | **Every number quoted in the abstract and the manuscript**, parsed from the reports |
+
+`test_headline_numbers.py` is the durable replacement for the byte-for-byte
+diffing used during the migration, now that reports are not versioned. It pins
+31 values plus three relationship tests that catch a semantic inversion even if
+someone updates a pin: the 9:1 intensity-to-amount ratio, the
+susceptibility-decay control (wettest-first must stay above intense-first), and
+gauges beating every reanalysis product. Mutation-tested — perturbing a report
+fails exactly the pins that depend on it.
+
+It **skips**, rather than fails, when the Box tree is unavailable, so a fresh
+clone on another machine still runs the 19 code-level tests.
+
+A failure there is not a licence to edit the expected value; the file's
+docstring carries the update protocol.
 
 Nothing generated is committed here — see the Box tree below.
 

@@ -73,11 +73,21 @@ shared dict rather than redefining it. Keep it that way.
 
 ## Conventions
 
-- **Never change a number silently.** Any refactor that touches analysis code
-  is verified by re-running the affected scripts and diffing their outputs
-  byte-for-byte against the previous ones. This caught a real quarter-day shift
-  during the reorganization. Legitimate differences are only the absolute paths
-  printed in "wrote ..." lines.
+- **Never change a number silently.** `tests/test_headline_numbers.py` pins
+  every value quoted in the abstract and the manuscript, parsed from the
+  reports, so run the test suite after any refactor that touches analysis code:
+
+      /opt/anaconda3/envs/pfdf_seasonality_env/bin/python -m pytest tests/ -q
+
+  For a larger refactor, also re-run the affected scripts and diff their
+  outputs against copies taken beforehand; that is what caught a real
+  quarter-day shift during the reorganization, and the only legitimate
+  differences are the absolute paths in "wrote ..." lines.
+
+  A pin failing is **not** a licence to edit the expected value. Either it is a
+  bug, or it is a deliberate result change — in which case update the pin *and*
+  every place the number is quoted, and say in the commit which number moved
+  and why.
 - **American English** everywhere, including figure labels and comments.
 - **Figures**: Okabe-Ito via `style.apply()`; season colors from
   `style.SEASON_COLOR`. Do not paste a palette into a script.
