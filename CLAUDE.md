@@ -7,11 +7,22 @@ manuscripts; this repository holds the code and the generated reports.
 
 Run the project's Python by absolute path; do not rely on an activated shell.
 
-    /opt/anaconda3/envs/pfdf_seasonality/bin/python scripts/10_analyze_seasonality.py
+    /opt/anaconda3/envs/pfdf_seasonality_env/bin/python scripts/10_analyze_seasonality.py
 
-Build it once with `conda env create -f environment.yml` (conda-forge, strict
-priority). Until that exists, `PointMan` has every dependency and works with
-`PYTHONPATH=$PWD/src`. Never install into `base`.
+The environment is `pfdf_seasonality_env` — repo name plus `_env`, so the
+checkout and the interpreter are never confused. Build it once with
+`conda env create -f environment.yml` (conda-forge, strict priority). Never
+install into `base`.
+
+It is the **minimum** to run the analysis. `xarray`, `zarr`, `fsspec` and
+`s3fs` are deliberately absent because only `20_`, `21_` and `23_` need them,
+and those re-extract CONUS404 from the cloud. Add them only if you are actually
+re-extracting:
+
+    /opt/anaconda3/bin/conda install -n pfdf_seasonality_env -c conda-forge xarray zarr fsspec s3fs
+
+Note that `conda` here is a shell function that is not available to
+non-interactive tooling; call `/opt/anaconda3/bin/conda` by absolute path.
 
 ## Data layout
 

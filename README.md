@@ -37,8 +37,14 @@ from its own location, so either tree can move without breaking the other.
 
 ```bash
 conda env create -f environment.yml
-conda activate pfdf_seasonality
+conda activate pfdf_seasonality_env
 ```
+
+The environment is named for the repository with an `_env` suffix, so it is
+obvious which is the checkout and which is the interpreter. It is the minimum
+needed to run the analysis; `xarray`, `zarr`, `fsspec` and `s3fs` are left out
+because they are only required to re-extract CONUS404 from the cloud (see
+`environment.yml`).
 
 `environment.yml` installs the package in editable mode. If the Box tree is not
 in the default location:

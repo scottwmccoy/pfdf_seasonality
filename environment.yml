@@ -1,36 +1,49 @@
-# Conda environment for the PFDF seasonality analysis.
-# Versions are those the published results were produced with (PointMan, 2026-09).
+# Minimum conda environment to run the pfdf_seasonality analysis.
 #
 #   conda env create -f environment.yml
-#   conda activate pfdf_seasonality
-#   pip install -e .          # installs this package in editable mode
+#   conda activate pfdf_seasonality_env
 #
-# conda-forge only, with strict channel priority, per the machine convention.
-name: pfdf_seasonality
+# The env is named for the repository with an `_env` suffix, so it is obvious
+# which is the checkout and which is the interpreter. Run it by absolute path
+# in scripts and agents:
+#
+#   /opt/anaconda3/envs/pfdf_seasonality_env/bin/python scripts/10_analyze_seasonality.py
+#
+# conda-forge only, with strict channel priority. Versions are pinned to
+# major.minor at the values the published results were produced with, because
+# the committed reports in results/reports/ are meant to be reproducible.
+#
+# NOT included: xarray, zarr, fsspec and s3fs. Those are needed only to
+# re-extract CONUS404 from the cloud (scripts 20_, 21_, 23_ — roughly 770 GB of
+# reads and several hours). The analysis runs from the extracted .npz files
+# already in the data tree. If you do need them:
+#
+#   conda install -n pfdf_seasonality_env -c conda-forge xarray zarr fsspec s3fs
+#
+# pyproj and GDAL are intentionally not listed: they are pulled in by geopandas
+# and rasterio, and pinning them here only makes the solve harder.
+name: pfdf_seasonality_env
 
 channels:
   - conda-forge
 
 dependencies:
   - python=3.10
+  # numerics
   - numpy=2.2
   - pandas=2.3
   - scipy=1.15
+  # figures. matplotlib-base omits the Qt stack; every script writes files
+  # rather than opening a window.
   - matplotlib-base=3.10
   - cycler=0.12
+  # geospatial
   - geopandas=1.1
   - shapely=2.1
   - rasterio=1.4
-  - pyproj=3.7
-  - gdal=3.10
-  # CONUS404 extraction only - not needed to reproduce the analysis from the
-  # extracted .npz files. Roughly 770 GB of cloud reads if you do re-run it.
-  - xarray=2025.6
-  - zarr=2.18
-  - fsspec=2026.3
-  - s3fs=2026.3
-  # tooling
+  # tests
   - pytest
+  # install this package in editable mode
   - pip
   - pip:
       - -e .
