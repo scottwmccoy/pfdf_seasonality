@@ -35,6 +35,7 @@ What every file in both trees is. Updated 2026-09-20, at the reorganization.
 | `23_validate_duration_sensitivity.py` | One-tile rate-vs-1-hour test |
 | `24_compare_conus404_durations.py` | Full-domain duration bracket (method superseded by `25_`) |
 | `25_evaluate_products.py` | **Eight-product comparison**: gauges vs reanalysis vs native 15-min |
+| `checks/thomas2026_overlap.py` | What the Thomas et al. (2026) damage register adds, and why it is not merged. Writes `thomas2026_overlap_report.txt` and a candidate table of the 901 unique fire × date pairs |
 | `plots/*.py` | Five figure scripts, all writing to the Box `results/figures/` |
 | `rerun_when_hourly_done.sh` | One-off watcher from the original extraction run; kept for reference |
 
@@ -73,6 +74,7 @@ Nothing generated is committed here — see the Box tree below.
 | Directory | What it is |
 |---|---|
 | `inventories/` | 12 published source inventories: `sciencebase_*` (USGS), `oakley_ijwf/` (Oakley et al. 2025 supplement), `cavagnaro_figshare/` (Cavagnaro et al. 2025 figshare) |
+| `inventories/thomas2026_damage/` | Thomas et al. (2026) national damage-and-loss register, doi:10.5066/P14FCFRE. **Not a compilation source** — it does not distinguish flash floods from debris flows (its ProcessSteps, step 2), so it is held as an independent table. `US_PFDF_DL_v1.csv` is **cp1252**, not UTF-8 |
 | `mtbs/` | MTBS national burned-area perimeters, 390 MB zip |
 | `aux/` | `cb_2023_us_state_20m.zip`, Census state boundaries |
 | `atlas14/` | Station annual-maximum series (`atlas14_ams/`), the 0.5-degree grid probe, endpoint response caches |
