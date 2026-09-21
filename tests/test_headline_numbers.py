@@ -111,7 +111,7 @@ PINS: list[Pin] = [
     Pin("analysis_report.txt", "wettest-season-first: flows in intense season",
         r"wettest season arrives first\s+n=\s*\d+\s+flows in intense season\s+([\d.]+)%",
         84.8, tol=0.05, after="60m: decisive subset with a fire date",
-        quoted_in="abstract: 'strengthens when the wet season arrives first'"),
+        quoted_in="paper: 'does not weaken' -- NOT 'strengthens', p=0.53"),
 
     # -------------------------------------------------- fire-to-first-flow lags
     Pin("ignition_lag_report.txt", "winter: first flow in the first intense season",
@@ -218,18 +218,36 @@ def test_the_9_to_1_ratio_still_holds():
                                   and p.report == "analysis_report.txt")))
     assert intense / wettest > 8.0, (
         f"intensity-to-amount ratio fell to {intense / wettest:.1f}:1; "
-        "the abstract claims roughly 9:1")
+        "the abstract claims roughly 9:1; it is now 11.6:1")
 
 
-def test_intensity_preference_strengthens_when_the_wet_season_comes_first():
-    """Rules out decaying susceptibility. If this inverts, the paper's control fails."""
+def test_intensity_preference_does_not_weaken_when_the_wet_season_comes_first():
+    """The anti-susceptibility-decay control, stated at the strength it has.
+
+    This test used to be named `..._strengthens_...` and asserted that the
+    wettest-first group sits ABOVE the intense-first group. It does, but not
+    significantly: 84.8% (n=33) against 77.4% (n=31) is +7.4 points at Fisher
+    exact p = 0.53, and it was p = 0.35 on the larger pre-correction sample.
+    Asserting "strengthens" pinned a claim the data do not support, which is
+    the opposite of what a pinned test is for.
+
+    What the control actually establishes is the falsifiable part: decaying
+    susceptibility predicts the intensity preference should WEAKEN when the wet
+    season arrives first, because the wet season then gets first call on the
+    most susceptible period. It does not weaken. That is the claim to make, and
+    it is the one asserted here — with a margin, so an inversion inside noise
+    does not fail the build while a real reversal does.
+
+    Recomputed each run by `scripts/checks/review_followups.py`, section B1.
+    """
     intense_first = float(_extract(next(
         p for p in PINS if p.label.startswith("intense-season-first"))))
     wettest_first = float(_extract(next(
         p for p in PINS if p.label.startswith("wettest-season-first"))))
-    assert wettest_first > intense_first, (
-        f"wettest-first {wettest_first}% is no longer above intense-first "
-        f"{intense_first}%; the susceptibility-decay control no longer holds")
+    assert wettest_first > intense_first - 10.0, (
+        f"wettest-first {wettest_first}% has fallen more than 10 points below "
+        f"intense-first {intense_first}%. That is the direction decaying "
+        "susceptibility predicts, and the paper's control would not hold.")
 
 
 def test_gauges_still_beat_every_reanalysis_product():

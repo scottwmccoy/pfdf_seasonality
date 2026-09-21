@@ -64,8 +64,14 @@ def main():
                  fontweight="bold", fontsize=9.5)
     ax.set_ylim(0, max(obs.max(), e_int.max(), e_wet.max()) * 1.42)
     ax.legend(fontsize=7.5, frameon=False, loc="upper left")
-    ax.text(0.97, 0.70, "$\\chi^2$ = 59 (intensity)\nvs 355 (amount)", transform=ax.transAxes,
-            ha="right", va="top", fontsize=8, color="0.3")
+    # Computed, not typed: these read 59 and 355 for months after the run that
+    # produced them, while the report said 45.0 and 282.4 -- a figure that
+    # looks calculated and is not is worse than no number at all.
+    chi_int = float(((obs - e_int) ** 2 / e_int).sum())
+    chi_wet = float(((obs - e_wet) ** 2 / e_wet).sum())
+    ax.text(0.97, 0.70,
+            f"$\\chi^2$ = {chi_int:.0f} (intensity)\nvs {chi_wet:.0f} (amount)",
+            transform=ax.transAxes, ha="right", va="top", fontsize=8, color="0.3")
 
     # ---- (c) the decisive subset: where the two models disagree
     ax = axes[1, 0]

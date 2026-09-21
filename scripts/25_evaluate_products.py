@@ -432,7 +432,7 @@ def event_section():
     ]
 
     say()
-    say("  COVERAGE — how many of the 349 events each product can classify:")
+    say(f"  COVERAGE — how many of the {len(df)} events each product can classify:")
     for lab, icol, _, prov in products:
         n = df[icol].notna().sum()
         say(f"    {lab:22s} {prov:6s} {n:3d} events  ({n / len(df) * 100:.0f}%)")

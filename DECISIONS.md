@@ -491,3 +491,67 @@ does write there — the NOAA endpoint caches and the extracted CONUS404 `.npz`
 regenerate the 1.6 GB of CONUS404 inputs without `xarray`/`fsspec`/`s3fs`/`zarr`.
 
 Found by independent subagent review (`docs/reviews/reproducibility.md`).
+
+## 2026-09-20 — How the result is stated (TRIAGE.md stage B)
+
+The review's own figures could not be quoted: they were measured before the
+compilation fixes and the removal of the post-fire window, which moved every
+denominator. `scripts/checks/review_followups.py` recomputes each disclosed
+number on the current sample and writes `review_followups_report.txt`, so the
+paper cites a generated report rather than a stale review.
+
+**B1. "Strengthens" is dropped; "does not weaken" replaces it.** The split is
+84.8% (n=33) against 77.4% (n=31): +7.4 points, Fisher exact **p = 0.53**. It
+was p = 0.35 on the larger pre-correction sample, so this was never supported.
+The control still works, because decaying susceptibility predicts the intensity
+preference should WEAKEN when the wet season arrives first and it does not —
+that is the falsifiable part, and it is what the paper now claims. The pinned
+test was renamed from `..._strengthens_...` to `..._does_not_weaken_...` and
+now asserts the direction with a margin instead of pinning a claim the data do
+not support.
+
+**B2. The decisive test speaks to the monsoon regime only.** 76 of 77 decisive
+events sit at summer-intense sites; one is SON; none is winter. Mechanical, not
+a sampling accident: in coastal and southern California the wettest and most
+intense seasons are both winter, so a winter event can never be decisive. The
+winter regime rests on the model comparison and the regime statistics instead.
+Stated in the Introduction and in Results item 4.
+
+**B3. Two figures printed literals from old runs.** The story figure's
+chi-square label read 59 and 355 where the report said 45.0 and 282.4; `25_`
+said "the 349 events" over a 300-event table. Both are computed now. A figure
+that looks calculated and is not is worse than no number.
+
+**B4. Fire-weighted numbers are reported alongside event-weighted.** 300 events
+from 143 fires, and 34% fall on a date when another fire also produced flows —
+one storm, several burn scars. Event-weighted 75.3% / 6.5%; fire-weighted
+**64.3% / 7.2%**. Directions hold; precision is what dependence costs.
+
+**B5. Lead with the binning-free score.** For each decisive event, which
+climatology assigned more probability to the month the flow actually happened?
+Intensity, in **69 of 77 (90%), binomial p = 3e-13**. No seasons, no bin edges.
+The ratio moves with where season boundaries are drawn — a one-month shift
+takes it from 11.6:1 to about 3:1 — and this does not.
+
+**B6. The concentration concern largely dissolved with A1.** The review found
+one apparent storm chain supplying 42% of the decisive subset. After the
+fire-keying fix the largest single fire is **13%**. The earlier figure was
+substantially an artifact of the defect the same review found. Still reported.
+
+**B7. The suspect-date filter is load-bearing, and now disclosed.** Eight
+events carry 1 January placeholders, six in Idaho. Including them moves the
+decisive subset from 75.3%/6.5% to **69.9%/12.0%**, ratio 11.6:1 to 5.8:1. The
+filter is necessary, not merely defensible — Idaho is summer-intense, so a
+1 January placeholder forces the event onto the wettest side and fabricates
+winter debris flows in a paper about seasonality — but the reader is owed the
+sensitivity.
+
+**B8. The amount model barely commits.** On the decisive subset it places a
+median 0.124 probability on its own favoured month, margin 0.013 over the
+runner-up. A 12:1 ratio against a near-indifferent alternative is weaker than
+it sounds; second reason to lead with B5.
+
+Stale counts through the draft were refreshed at the same time (320 events,
+3,204 records, 4,062 raw, 169 fires, 284 MTBS matches, 26 of 300 events with no
+Atlas 14 coverage). The published abstract body is untouched; its superseded
+table carries the current values.
