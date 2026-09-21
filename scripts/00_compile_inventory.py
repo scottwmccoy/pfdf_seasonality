@@ -601,6 +601,135 @@ def load_oregon2024() -> pd.DataFrame:
     return finish(out, "oregon2024")
 
 
+#: How close two records must be, in space and in fire start date, to be taken
+#: as the same fire. Measured 2026-09-20: every literature record that matches a
+#: named fire on start date sits within 4.7 km of it (median 1.5), and nothing
+#: else lies inside a 40 km search radius, so the separation is clean.
+FIRE_MATCH_KM = 5.0
+FIRE_MATCH_DAYS = 7
+
+
+def resolve_literature_fire_keys(points: pd.DataFrame) -> pd.DataFrame:
+    """Give literature records a FIRE key instead of an EVENT key.
+
+    The literature source carries no fire name, so `load_literature` keys each
+    record `litevent<EventID>`. But EventID is the source's own identifier for
+    "debris flows grouped together as being part of a single debris-flow event"
+    — a STORM, not a fire. Using it as `fire_key` has two separate consequences:
+
+    1. A literature record can never merge with the same fire under its real
+       name, so a flow reported by both the literature database and a named
+       inventory becomes two events. This is the one that inflates the event
+       count.
+    2. One fire is split into as many "fires" as it had storms — up to seven
+       for Grizzly Creek (2020-08-10). Event counts are unaffected, because
+       those storms have different dates, but every fire-level statistic is:
+       events per fire, first flow per fire, and any clustering correction.
+
+    Both are fixed by resolving fire identity from what the source does carry,
+    `DateFireStart` plus location. Named records are never modified; only
+    literature keys are reassigned, so the blast radius stays small.
+    """
+    p = points.copy()
+    is_lit = p.source_key.eq("literature")
+    geo = p.latitude.notna() & p.longitude.notna() & p.fire_start_date.notna()
+    usable = is_lit & geo
+    if not usable.any():
+        return p
+
+    lit = p[usable]
+    named = p[~is_lit & geo & p.group_key.notna()]
+
+    # ONE projection over both frames: `_to_local_xy` takes its reference
+    # latitude from the data it is handed, so projecting them separately would
+    # put the two sets on different planes.
+    both = pd.concat([lit, named])
+    XY = _to_local_xy(both.latitude.to_numpy(), both.longitude.to_numpy())
+    xy_lit, xy_named = XY[:len(lit)], XY[len(lit):]
+    radius_m = FIRE_MATCH_KM * 1000.0
+
+    # --- 1. cluster literature records into FIRES: same start date (within
+    # tolerance) and close together. This both joins one fire split across
+    # several EventIDs and separates several fires filed under one.
+    parent = list(range(len(lit)))
+
+    def find(a):
+        while parent[a] != a:
+            parent[a] = parent[parent[a]]
+            a = parent[a]
+        return a
+
+    start = lit.fire_start_date.to_numpy()
+    for a, b in cKDTree(xy_lit).query_pairs(r=radius_m):
+        if abs((start[a] - start[b]) / np.timedelta64(1, "D")) <= FIRE_MATCH_DAYS:
+            ra, rb = find(a), find(b)
+            if ra != rb:
+                parent[ra] = rb
+    cluster = pd.Series([find(k) for k in range(len(lit))], index=lit.index)
+
+    # --- 2. per cluster, adopt a named fire's key, else synthesize a stable one
+    tree = cKDTree(xy_named) if len(named) else None
+    pos = {ix: k for k, ix in enumerate(lit.index)}
+    adopted_fires, synthesized, split, joined = set(), 0, 0, 0
+
+    for _, idx in cluster.groupby(cluster).groups.items():
+        idx = list(idx)
+        originals = set(p.loc[idx, "group_key"])
+        key = name = None
+        if tree is not None:
+            for ix in idx:                      # nearest named fire, any member
+                cand = tree.query_ball_point(xy_lit[pos[ix]], r=radius_m)
+                if not cand:
+                    continue
+                c = named.iloc[cand]
+                dt = (c.fire_start_date - p.at[ix, "fire_start_date"]).dt.days.abs()
+                near = (dt <= FIRE_MATCH_DAYS).to_numpy()
+                if not near.any():
+                    continue
+                d = np.linalg.norm(xy_named[cand] - xy_lit[pos[ix]], axis=1)
+                j = int(np.argmin(np.where(near, d, np.inf)))
+                key, name = c.iloc[j].group_key, c.iloc[j].fire_name
+                break
+        if key is None:
+            # Deterministic, and carries the fire date so an EventID covering
+            # two fires yields two obviously different keys.
+            #
+            # Note this key is coarser than the 5 km clustering above: two
+            # clusters sharing an EventID AND a start date collapse back to one
+            # key. That is deliberate — it reconnects a single burn scar whose
+            # mapped points are more than 5 km apart, which happens for three
+            # keys here, spread up to 11.8 km from their centroid. Geography
+            # therefore only ever SPLITS an EventID that covers distinct fires;
+            # it never splits one fire on distance alone.
+            stamp = pd.Timestamp(p.at[idx[0], "fire_start_date"]).strftime("%Y%m%d")
+            stem = min(originals).replace("litevent", "")
+            key = f"litfire{stem}_{stamp}"
+            synthesized += 1
+        else:
+            adopted_fires.add(key)
+        for ix in idx:
+            p.at[ix, "group_key"] = key
+            if pd.isna(p.at[ix, "fire_name"]) and name is not None:
+                p.at[ix, "fire_name"] = name
+                p.at[ix, "fire_name_norm"] = norm_fire(name)
+        if len(originals) > 1:
+            joined += 1
+
+    # an original key landing in more than one cluster was several fires
+    split = int((p.loc[usable].groupby(points.loc[usable, "group_key"])
+                 .group_key.nunique() > 1).sum())
+
+    before = points.loc[usable, "group_key"].nunique()
+    after = p.loc[usable, "group_key"].nunique()
+    print("\nResolving literature fire identity (EventID is a storm, not a fire) ...")
+    print(f"  {len(lit)} records -> {after} fires "
+          f"({len(adopted_fires)} matched a named fire, {synthesized} literature-only)")
+    print(f"  {joined} fires were split across several EventIDs and are now joined")
+    print(f"  {split} EventIDs covered more than one fire and are now separated")
+    print(f"  literature fire keys: {before} -> {after}")
+    return p
+
+
 def load_literature() -> pd.DataFrame:
     """McGuire et al. (2024) literature-derived database (global; clipped to western US).
 
@@ -928,6 +1057,7 @@ def main():
     ]
     frames = [fn() for fn in loaders]
     points_raw = pd.concat(frames, ignore_index=True)
+    points_raw = resolve_literature_fire_keys(points_raw)
     oakley = load_oakley_events()
 
     print("\nAssigning missing state codes by point-in-polygon ...")

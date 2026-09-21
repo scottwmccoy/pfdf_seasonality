@@ -210,3 +210,52 @@ were regenerated.
 
 Found by an independent subagent review, 2026-09-20 (`docs/reviews/compilation.md`
 in the Box tree). Reported to the author for correction upstream.
+
+## 2026-09-20 — Literature fire identity: EventID is a storm, not a fire
+
+`load_literature` keyed every record `litevent<EventID>` because the source
+carries no fire name. But the source defines EventID as "debris flows grouped
+together as being part of a single debris-flow event" — a STORM. Using it as
+the fire key produced three distinct defects at once:
+
+1. **One fire split across many keys.** Grizzly Creek (2020-08-10) held seven
+   EventIDs; Station six. Every fire-level statistic was wrong: events per
+   fire, first flow per fire, and any clustering correction.
+2. **Many fires under one key.** 21 of 397 EventIDs span more than one
+   `DateFireStart`. EventID 312 covers Wildwood (22-Sep-1997) and Wohlford
+   (02-Aug-1997), 94 km apart, joined only by a shared storm on 01-Dec-1997.
+3. **No merge with named inventories.** A literature record could never join
+   the same fire under its real name, so a flow reported by both the literature
+   database and a named inventory became two events.
+
+`resolve_literature_fire_keys` now derives fire identity from what the source
+does carry — `DateFireStart` plus location — by union-find over records within
+5 km whose start dates agree within 7 days, then adopting a named fire's key
+where one lies within the same tolerances. Named records are never modified.
+
+Thresholds were measured, not guessed: every literature record matching a named
+fire on start date sits within 4.7 km of it (median 1.5), with nothing else
+inside a 40 km search radius.
+
+    973 literature records -> 118 fires (36 matched a named fire)
+    54 fires joined that had been split across EventIDs
+    8 EventIDs separated that had covered more than one fire
+    literature fire keys: 239 -> 118
+    events: 339 -> 328
+
+**Effect on the result — it strengthens.**
+
+    decisive subset : 76 at 73.7% / 7.9%  ->  67 at 74.6% / 6.0%
+    ratio           : 9.3:1               ->  12.4:1
+    winter          : 133, 27 Dec, R 0.49 ->  134, 27 Dec, R 0.48
+    summer          : 135, 01 Aug, R 0.87 ->  123, 02 Aug, R 0.88
+    60-min M2 - M1  : 126.7               ->  119.0
+
+**One consequence worth carrying into the writing.** The anti-decay control
+narrows from 74.3 / 86.7 to 79.3 / 85.7 — a 6.4-point gap where it was 12.4.
+The claim that the intensity preference *strengthens* when the wet season
+arrives first was already not significant (Fisher p = 0.35 on the old split);
+it is now weaker still. Use "does not weaken". See `docs/reviews/TRIAGE.md`, B1.
+
+Found by independent subagent review (`docs/reviews/compilation.md`, corroborated
+by `independence.md` and `decisive_subset.md`).
