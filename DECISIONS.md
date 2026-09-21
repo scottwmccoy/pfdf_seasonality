@@ -440,3 +440,54 @@ the cutoff it was meant to justify.
 
 TRIAGE.md items D1 and D2, resolved together by removing the thing they
 criticized.
+
+## 2026-09-20 — Reproducibility (TRIAGE.md stage C)
+
+**C1. The station climatology can now be regenerated, and the committed code
+reproduces it exactly.** `03_` writes `atlas14_station_seasonality.csv`; `04_`
+read it and wrote back to the same path, so a second run of `04_` merged the
+normals onto columns that already held them and died on `KeyError`, and
+rerunning `03_` afterwards silently stripped the normals from five downstream
+consumers. `04_` now drops the columns it owns before merging, and fails with
+a clear message if `03_` has not run.
+
+The file on disk was dated 2026-08-05, before the reorganization, and nothing
+in the tree showed the committed code had ever produced it. It has now:
+regenerating from raw and diffing against a copy of the 5 August file gives
+**3,301 rows and 101 columns identical, zero differing values**. The
+reproducibility gap was real; a correctness problem was not. The sequence
+`03 -> 04 -> 04 -> 03 -> 04` is now idempotent and was verified to be.
+
+**C2. A stale MTBS file can no longer misjoin silently.** `event_id` is
+positional (`EV00000` upward in row order), so it is not stable across
+recompilations — a stale file does not fail to join, it joins to the WRONG
+events. `add_postfire_interval` now checks identity, not presence: every
+compiled event must appear in the MTBS file, and each id must point at the
+same fire and date on both sides. Verified by truncating the file and
+confirming the guard fires.
+
+**C3. A missing states shapefile now fails loudly.** `assign_states` returned
+the unmodified column when the zip was absent. `load_literature` sets no state
+at all, so the caller then dropped 958 records under the message "outside any
+US state" — a silent 30% loss reported as a bounding-box clip.
+
+**C4. Small.** `pyproject.toml` now declares `openpyxl`, which `00_` needs for
+`read_excel` and which only `environment.yml` had. `paths.ensure_dirs` was
+defined and never called, so six scripts did their work and then died on
+`savefig` in a clean tree; `style.apply` and `report.tee` now call it, which
+between them covers every figure and report writer. `06_fetch_event_durations`
+ran its fetch at MODULE level with no guard, so importing it fired 690 requests
+at NOAA — note that appending a `__main__` guard below the module-level code
+does NOT fix this, because the requests go out while the module is still
+executing; the work moved into `main()`. `RESOURCE_MAP.md` said nine reports
+and eight figures where there are fourteen and eleven, and described
+`data/logs/` as a live output directory when nothing writes it.
+
+**C5. The `data/raw/` invariant was a documentation error, not a code one.**
+`paths.py` and `RESOURCE_MAP.md` already said "never written by *analysis*
+code", which is accurate; `CLAUDE.md` dropped the qualifier. Acquisition code
+does write there — the NOAA endpoint caches and the extracted CONUS404 `.npz`
+— and `CLAUDE.md` now says so, including that the declared environment cannot
+regenerate the 1.6 GB of CONUS404 inputs without `xarray`/`fsspec`/`s3fs`/`zarr`.
+
+Found by independent subagent review (`docs/reviews/reproducibility.md`).

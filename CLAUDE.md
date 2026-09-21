@@ -44,7 +44,15 @@ goes to the Box tree:
 | Text reports | `REPORTS` — Box `results/reports/` |
 | Figures | `FIGURES` — Box `results/figures/` |
 | Analysis-ready tables | `PROCESSED` — Box `data/processed/` |
-| Raw inputs | `RAW` — Box `data/raw/`, never written by code |
+| Raw inputs | `RAW` — Box `data/raw/`, never written by *analysis* code |
+
+`data/raw/` holds externally sourced data, and acquisition code does write
+there: `02_`/`06_`/`atlas14.py` keep their NOAA endpoint caches in
+`data/raw/atlas14/`, and `20_`/`21_` write the extracted CONUS404 `.npz` into
+`data/raw/conus404/`. What never writes there is anything that derives a
+result — those go to `data/processed/` and `results/`. The 1.6 GB of CONUS404
+"raw" inputs are code outputs in that sense, and the declared environment
+cannot regenerate them without `xarray`/`fsspec`/`s3fs`/`zarr`.
 
 Figures and reports are siblings under `results/` on purpose, and there is
 exactly one of each directory. A second copy of a figure or report beside a

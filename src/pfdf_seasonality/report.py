@@ -23,7 +23,7 @@ import sys
 from contextlib import contextmanager
 from pathlib import Path
 
-from .paths import REPORTS
+from .paths import REPORTS, ensure_dirs
 
 __all__ = ["tee"]
 
@@ -50,6 +50,7 @@ def tee(name: str, echo: bool = True):
     available to diagnose the failure rather than a stale one being left in
     place to be mistaken for current.
     """
+    ensure_dirs()          # a clean data tree has no results/ folders yet
     dest = Path(REPORTS) / name
     dest.parent.mkdir(parents=True, exist_ok=True)
     buf = io.StringIO()

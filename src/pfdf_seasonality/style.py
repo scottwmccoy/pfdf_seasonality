@@ -8,6 +8,8 @@ instead of pasting the block.
 from __future__ import annotations
 
 import matplotlib.pyplot as plt
+
+from .paths import ensure_dirs
 from cycler import cycler
 
 __all__ = ["OKABE_ITO", "SEASON_COLOR", "C_INTENSE", "C_WET", "C_SAME", "C_DIFF",
@@ -28,7 +30,15 @@ MONTH_INITIALS = list("JFMAMJJASOND")
 
 
 def apply(dpi: int = 130, savefig_dpi: int = 200, font_size: int = 9) -> None:
-    """Set the project's matplotlib defaults. Call once, at import time."""
+    """Set the project's matplotlib defaults. Call once, at import time.
+
+    Also creates the output directories. Every figure-producing script in the
+    project calls this, and `report.tee` does the same for report writers, so
+    between them a clean data tree gains its `results/` folders before anything
+    tries to save into one. `paths.ensure_dirs` was previously defined and
+    never called, so six scripts did their work and then died on `savefig`.
+    """
+    ensure_dirs()
     plt.rcParams['axes.prop_cycle'] = cycler(color=OKABE_ITO)
     plt.rcParams['image.cmap'] = 'viridis'
     plt.rcParams.update({

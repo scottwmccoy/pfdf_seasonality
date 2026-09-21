@@ -331,7 +331,15 @@ def assign_states(df: pd.DataFrame) -> pd.Series:
 
     shp = STATES_ZIP
     if not shp.exists():
-        return df["state"]
+        # Not optional. `load_literature` sets no state at all, so returning
+        # here leaves 958 records with a null state, which the caller then
+        # drops under the message "outside any US state" -- a silent 30% loss
+        # of the database reported as a bounding-box clip.
+        raise SystemExit(
+            f"{shp} is missing. It is required: the literature source carries "
+            "no state field, and without point-in-polygon every one of its "
+            "records is dropped as 'outside any US state'. Download "
+            "cb_2023_us_state_20m.zip from the US Census TIGER/Line site.")
     states = gpd.read_file(shp)[["STUSPS", "geometry"]].to_crs(4326)
     need = df["state"].isna() | df["state"].astype(str).str.strip().isin(["", "nan", "None"])
     if not need.any():

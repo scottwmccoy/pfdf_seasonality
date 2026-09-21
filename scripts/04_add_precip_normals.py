@@ -36,8 +36,30 @@ def coop_to_ghcn(sid: str) -> str | None:
     return f"USC00{state}{num.zfill(4)}"
 
 
+#: Columns this script adds to `03_`'s output. Dropped before the merge so a
+#: second run rebuilds them instead of colliding with itself.
+_ADDED = ([f"prcp_norm_{m:02d}" for m in range(1, 13)]
+          + ["ghcn_id", "wettest_season", "wettest_month", "annual_prcp_mm",
+             "has_normals"])
+
+
 def main():
+    if not STATIONS.exists():
+        raise SystemExit(
+            f"{STATIONS} is missing. Run 03_build_station_seasonality.py first; "
+            "this script adds the NCEI normals to that file in place.")
     st = pd.read_csv(STATIONS)
+
+    # This script writes back to the file it reads. Without this, a second run
+    # merges the normals onto columns that already hold them, producing
+    # `prcp_norm_01_x` / `_y` and failing on the next line that names one.
+    # Rerunning 03_ afterwards is also safe: it rewrites the file without these
+    # columns, and rerunning 04_ puts them back.
+    stale = [c for c in _ADDED if c in st.columns]
+    if stale:
+        print(f"  rebuilding {len(stale)} columns left by an earlier run")
+        st = st.drop(columns=stale)
+
     st["ghcn_id"] = st.station_id.map(coop_to_ghcn)
 
     nm = pd.read_csv(NORMALS, usecols=["GHCN_ID", "month", "MLY-PRCP-NORMAL"])

@@ -99,6 +99,28 @@ def add_postfire_interval(ev: pd.DataFrame) -> pd.DataFrame:
     ign = pd.Series(pd.NaT, index=out.index)
     if mt_path.exists():
         mt = pd.read_csv(mt_path, low_memory=False, parse_dates=["mtbs_ig_date"])
+        # `event_id` is positional -- EV00000 upward in row order -- so it is
+        # not stable across recompilations. A stale MTBS file therefore does
+        # not fail to join; it joins to the WRONG events and silently attaches
+        # the wrong ignition dates. Check identity, not just presence.
+        missing = set(out.event_id) - set(mt.event_id)
+        if missing:
+            raise SystemExit(
+                f"{mt_path.name} is stale: {len(missing)} of {len(out)} compiled "
+                f"events are absent from it (e.g. {sorted(missing)[:3]}). "
+                "`event_id` is positional, so a stale file misattributes "
+                "ignition dates rather than failing. Rerun 01_match_mtbs.py.")
+        shared = out[["event_id", "fire_key", "event_date"]].merge(
+            mt[["event_id", "fire_key", "event_date"]].assign(
+                event_date=lambda d: pd.to_datetime(d.event_date, errors="coerce")),
+            on="event_id", suffixes=("", "_mt"))
+        drifted = (shared.fire_key.ne(shared.fire_key_mt)
+                   | shared.event_date.ne(shared.event_date_mt)).sum()
+        if drifted:
+            raise SystemExit(
+                f"{mt_path.name} is stale: {drifted} event ids point at a "
+                "different fire or date than the compilation does. Rerun "
+                "01_match_mtbs.py.")
         m = out[["event_id"]].merge(mt[["event_id", "mtbs_ig_date"]], on="event_id",
                                     how="left")
         ign = pd.to_datetime(m.mtbs_ig_date).to_numpy()

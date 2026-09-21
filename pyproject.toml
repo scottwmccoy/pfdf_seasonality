@@ -25,6 +25,8 @@ dependencies = [
     "shapely>=2.1",
     "rasterio>=1.4",
     "pyproj>=3.7",
+    # 00_compile_inventory reads two .xlsx sources; pandas imports this lazily
+    "openpyxl>=3.1",
 ]
 
 [project.optional-dependencies]

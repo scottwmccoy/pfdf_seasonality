@@ -90,13 +90,13 @@ Nothing generated is committed here — see the Box tree below.
 
 ### `data/logs/`
 
-Extraction logs from the CONUS404 and Atlas 14 runs.
+Historical shell-redirect logs from the pre-reorganization layout (2026-08-05). No script writes here: `paths.LOGS` is imported by `20_` and never used, and the files reference paths that no longer exist. Kept as a record of those runs, not as a live output directory.
 
 ### `results/` — every generated output, figures and reports side by side
 
 #### `results/reports/`
 
-Nine generated text reports, the provenance record for every number in the
+Fourteen generated text reports, the provenance record for every number in the
 manuscript. If a number is not in one of these, it is not ready to quote.
 
 `analysis_report.txt` (core seasonality) · `ignition_lag_report.txt` ·
@@ -107,7 +107,7 @@ manuscript. If a number is not in one of these, it is not ready to quote.
 
 #### `results/figures/` — the only figures directory
 
-Eight generated PNGs, written here by `scripts/plots/` and by `24_`/`25_`.
+Eleven generated PNGs, written here by `scripts/plots/`, by `24_`/`25_`/`12_`, and by the checks under `scripts/checks/`.
 `pfdf_seasonality_gauge_story.png` is the core result; `ignition_lag.png` and
 `first_flow_prediction.png` are the timing results;
 `seasonality_product_evaluation.png` is the product comparison;
