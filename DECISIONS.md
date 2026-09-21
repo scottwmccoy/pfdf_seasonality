@@ -177,8 +177,12 @@ the fire name, so a corrected upstream file passes through untouched.
    without arithmetic; the spreadsheet itself holds the 2013-2014 dates beside
    `Year = 2009`.
 2. Station is the only fire affected. Of 43 fires in the file, 41 have their
-   first storm 0 or 1 years after the fire year. Station is at +4. (Boot 2018
-   sits at +3 from a personal communication — a separate, 5-row question.)
+   first storm 0 or 1 years after the fire year, and Station is at +4. The one
+   other fire past two years, Boot (2018, +3, five rows from a personal
+   communication), is **not** an error: SWM authored that entry and confirms
+   the event genuinely occurred three years after the fire (2026-09-20). It is
+   deliberately left alone, and the correction is scoped to Station by name
+   and year so it cannot reach it.
 3. `volumes227`, an independent USGS release, records the same Station Fire
    storms at 2009-11-12, 2009-12-11, 2010-01-18 and 2010-02-06 — Cavagnaro's
    dates minus exactly four years, matching to within a day for four of five.
@@ -591,3 +595,23 @@ to look them up again.
 Worth noting for that conversation: the paper is strengthened, not weakened, by
 the sources being separately citable. The compilation is a derived product and
 the source teams should be credited for the observations either way.
+
+## 2026-09-20 — A verified 3-year postfire debris flow
+
+The Boot Fire (2018) entry in the Cavagnaro release records a debris flow three
+years after the fire. SWM authored that entry and confirms the lag is real, not
+a date error — the only such confirmation in the database from someone with
+direct knowledge of the observation.
+
+It is worth keeping in view for two reasons.
+
+**It vindicates removing the post-fire window.** The 2-year window applied
+earlier the same day would have discarded this event, and it is one of the few
+long-lag records whose date is confirmed by the person who entered it. A cutoff
+that excludes author-verified observations to remove a landslide population
+that the initiation filter already removes is doing harm for no gain.
+
+**It is the counter-example to reach for** when the lag distribution is
+described. Runoff-generated activity at three years is uncommon but real, and
+the paper should not imply a hard ceiling. The longest runoff-generated lag in
+the compilation is 4.2 years.
