@@ -54,7 +54,7 @@ PINS: list[Pin] = [
     Pin("compilation_report.txt", "unique fire-by-date events",
         r"unique events\s+:\s+(\d+)", 320, quoted_in="abstract: 'over 300'"),
     Pin("compilation_report.txt", "debris-flow records after de-duplication",
-        r"after de-duplication\s+:\s+(\d+)", 3526, quoted_in="abstract: 'over 3,500'"),
+        r"after de-duplication\s+:\s+(\d+)", 3204, quoted_in="abstract says \'over 3,500\' - SUPERSEDED, now 3,204"),
 
     # ------------------------------------------------ the analysis-stage scope
     # Guards the two filters in `pfdf_seasonality.events`. If either is silently

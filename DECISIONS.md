@@ -349,3 +349,44 @@ coordinates. Any comparison across two frames must project them together.
 
 Found by independent subagent review (`docs/reviews/compilation.md`).
 TRIAGE.md item A3.
+
+## 2026-09-20 — Dolan: one stream segment is one debris flow
+
+`load_dolan2020` kept every row of the release as a debris-flow record. But a
+row is one OBSERVATION, and `FireSegmentID` is the stream segment it sits on
+(release README, field list). A segment is routinely observed at several points
+a few tens of metres apart on the same date — the mapped extent of one
+response, not several debris flows. 2,144 observations carried only 1,803
+segments.
+
+The record-level de-duplication cannot catch these: pass B is cross-source
+only, deliberately, because two nearby records inside one inventory are
+normally two real adjacent flows. That reasoning is right in general and wrong
+for this specific column, which names the unit explicitly.
+
+The loader now collapses to one record per segment, preferring field-verified
+(`Response == 3`) over remotely mapped (`Response == 2`).
+
+    records: 3,526 -> 3,204   (341 extra points on already-counted segments)
+    events : 320 -> 320       (unchanged)
+
+**Every analysis result is byte-identical.** Only one pinned number moved, the
+record count, which confirms what was already believed: `n_debris_flows` is
+carried for description and is used by no analysis.
+
+**It does break a published claim.** The AGU abstract says "over 3,500 debris
+flows". The compilation holds 3,204. "Over 300 events" still holds. The paper
+must not repeat the flow count, and the abstract now carries this in its
+superseded table.
+
+Worth stating plainly in the paper: a record count summed across these sources
+was never a comparable quantity. Dolan maps channel segments about 10 m apart
+and contributed 57% of all records; the other inventories map basin outlets.
+Events are the unit the analysis uses and the unit the paper should lead with.
+
+## 2026-09-20 — Butte year conflict: resolved, no action
+
+Reported by the compilation review alongside the Station date shift. Both
+sources now agree the Butte fire is 2015, and its two March 2016 dates merged
+under `canonicalize_storm_dates`. Nothing further to fix; recorded so it is not
+re-investigated.

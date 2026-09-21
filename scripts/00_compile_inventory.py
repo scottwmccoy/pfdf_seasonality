@@ -577,6 +577,22 @@ def load_dolan2020() -> pd.DataFrame:
     # Response: 0 = no erosion, 1 = flood, 2 = remotely mapped DF, 3 = field-verified DF
     d = pd.read_csv(RAW / "sciencebase_dolan2020/Inventory.csv", low_memory=False)
     d = d[d["Response"].isin([2, 3])].copy()
+
+    # One row is one OBSERVATION; `FireSegmentID` is the stream segment it sits
+    # on (release README, field list). A segment is routinely observed at
+    # several points a few tens of metres apart on the same date -- the mapped
+    # extent of one response, not several debris flows -- so 2,080 rows carry
+    # only 1,759 segments. We already treat the segment as the unit
+    # (`location_type` below), and the record-level de-duplication cannot catch
+    # these because they are within a single source, where two nearby records
+    # are normally two real adjacent flows.
+    #
+    # Field-verified (3) wins over remotely mapped (2) where a segment has both.
+    before = len(d)
+    d = (d.sort_values(["FireSegmentID", "Response"], ascending=[True, False])
+           .drop_duplicates(subset="FireSegmentID", keep="first"))
+    print(f"  dolan2020: {before} observations -> {len(d)} stream segments "
+          f"({before - len(d)} extra points on an already-counted segment)")
     out = pd.DataFrame(
         {
             "fire_name": d["FireName"],
