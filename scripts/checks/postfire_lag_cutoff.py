@@ -60,26 +60,41 @@ C = {"DJF": "#56B4E9", "JJA": "#E69F00"}
 
 
 # ----------------------------------------------------------------- exposure
-def observation_horizons() -> dict[str, pd.Timestamp]:
-    """Latest date each source could have recorded a debris flow."""
+def add_exposure(ev: pd.DataFrame) -> pd.DataFrame:
+    """`observable_years`: how long after ignition this event was watched.
+
+    The horizon is per PAPER, not per source. An earlier version took the max
+    date of the whole source, which credited every fire in the literature
+    database with observation through 2021 — that database is a compilation of
+    many studies, each of which stopped looking when its own fieldwork ended.
+    It gave 70% of fires five or more years of apparent observation and so
+    understated the tail: the denominator fell 29% over a range where the
+    numerator fell 99%.
+
+    Each literature record is therefore keyed by its own `original_source`
+    reference, and every other source by itself. An event's horizon is the
+    latest horizon among the records that constitute it.
+    """
     rec = pd.read_csv(PROCESSED / "inventory" / "pfdf_occurrence_records_compiled.csv",
                       low_memory=False, parse_dates=["event_date"])
-    h = rec.groupby("source_key").event_date.max().to_dict()
+    hkey = np.where(rec.source_key.eq("literature"),
+                    rec.source_key + "::" + rec.original_source.astype(str),
+                    rec.source_key)
+    rec = rec.assign(_hkey=hkey)
+    horizon_of = rec.groupby("_hkey").event_date.max()
+    rec["_horizon"] = rec._hkey.map(horizon_of)
+
+    per_event = (rec.groupby(["group_key", "event_date"])._horizon.max()
+                    .rename("horizon").reset_index()
+                    .rename(columns={"group_key": "fire_key"}))
+
+    out = ev.merge(per_event, on=["fire_key", "event_date"], how="left")
+    out.index = ev.index
+    # Oakley-only events have no point records; fall back to that source's span
     oak = PROCESSED / "inventory" / "pfdf_oakley2025_events_standardized.csv"
-    if oak.exists():
+    if oak.exists() and out.horizon.isna().any():
         o = pd.read_csv(oak, low_memory=False, parse_dates=["event_date"])
-        h["oakley2025"] = o.event_date.max()
-    return h
-
-
-def add_exposure(ev: pd.DataFrame) -> pd.DataFrame:
-    """`observable_years`: how long after ignition this event's sources looked."""
-    h = observation_horizons()
-    out = ev.copy()
-    horizon = out.sources.fillna("").map(
-        lambda s: max((h[k] for k in str(s).split("|") if k in h),
-                      default=pd.NaT))
-    out["horizon"] = pd.to_datetime(pd.Series(horizon, index=out.index))
+        out.loc[out.horizon.isna(), "horizon"] = o.event_date.max()
     out["observable_years"] = ((out.horizon - out.ignition_date).dt.days / 365.25)
     return out
 
@@ -220,39 +235,34 @@ def main() -> None:
 
     # ------------------------------------------------------------- 4. verdict
     print("\n" + "-" * 76)
-    print("4. VERDICT — keep 2 years, on three criteria that agree")
+    print("4. VERDICT — no post-fire window is applied")
     print("-" * 76)
-    asym = tab[tab.cutoff == "none"].iloc[0]
-    for _, r in tab.iterrows():
-        if r.cutoff in ("1 yr", "1.5 yr", "2 yr", "3 yr"):
-            print(f"    {r.cutoff:>7}: keeps {r.n_events:>3} events, "
-                  f"season mix off the full database by "
-                  f"{abs(r.obs_DJF - asym.obs_DJF):.1f} pts (DJF)")
     print("""
-  (a) RATE. The exposure-corrected rate falls from 78 events per 100 fires in
-      the first half-year to 8 by 1.5-2 yr, then sits on a 1-6 plateau all the
-      way to 5 yr. The postfire signal is spent by about 2 years.
+  This script was written to justify a 2-year cutoff. It does not, and the
+  cutoff was removed on 2026-09-20. What it establishes instead is that no
+  cutoff is needed.
 
-  (b) SEASON-MIX NEUTRALITY — the criterion that matters most for THIS paper.
-      Flows arrive in discrete seasons, so the lag distribution is modulated by
-      the annual clock (panel a). A cutoff landing mid-cycle keeps one season
-      and drops the next, which would manufacture seasonality in a paper whose
-      subject is seasonality. Cutting at 1 yr leaves the retained sample 5.9
-      points too winter-heavy; 1.5 yr, 1.7 points; 2 yr, 0.5 points. Two years
-      is the shortest cutoff whose sample looks like the full database.
+  THE ARGUMENT FOR A CUTOFF DOES NOT HOLD. Two of the three criteria used to
+  pick 2 years were unsound. The season-mix criterion compared the retained
+  sample against the full sample — a NESTED comparison whose difference must go
+  to zero as the cutoff grows, so it measured its own construction rather than
+  the data; the gap it rested on was about a point, well inside noise. And on
+  first flows per fire the rate is already at its plateau by 1.5 yr, so 1.5 was
+  as defensible as 2.0, which is another way of saying neither was.
 
-      This is the argument against following the rate break alone to 1.5 yr.
+  THE CUTOFF DOES NOT CHANGE THE ANSWER. Section 3 is the evidence: across
+  every cutoff from 0.5 yr to none, the decisive subset holds. A filter that
+  changes nothing but the sample size is a liability in review, not a
+  safeguard.
 
-  (c) CAPTURE. 2 yr keeps 89% of runoff-generated events; going to 3 yr buys
-      6 more points and 5 yr buys 11, at the cost of (b).
+  PROCESS IS FILTERED ON PROCESS. The landslide tail the window was
+  incidentally catching is excluded by `initiation_class` instead, which is
+  what actually distinguishes it. Removing the window readmits 30 events, the
+  longest 4.2 yr after its fire, of which none is landslide-initiated.
 
-  And the choice does not carry the result. Across every cutoff from 0.5 yr to
-  none, the decisive subset stays at 71-75% intense vs 5-9% wettest, a ratio of
-  8:1 to 13:1. Report the 2-yr numbers, and report this table, so the window
-  reads as a scope decision the result does not depend on.
-
-  Worth stating separately: after the runoff filter the longest lag in the
-  database is 5.0 yr. Every event beyond 5 years was landslide-initiated.""")
+  Sections 1 and 2 stand on their own as a description of how long after a
+  fire runoff-generated debris flows occur, which is a result worth reporting
+  in its own right.""")
 
     # ------------------------------------------------------------- 5. figure
     fig, ax = plt.subplots(2, 2, figsize=(11, 7.5))

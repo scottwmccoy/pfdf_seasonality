@@ -390,3 +390,53 @@ Reported by the compilation review alongside the Station date shift. Both
 sources now agree the Butte fire is 2015, and its two March 2016 dates merged
 under `canonicalize_storm_dates`. Nothing further to fix; recorded so it is not
 re-investigated.
+
+## 2026-09-20 — The post-fire window is removed
+
+`POSTFIRE_WINDOW_YEARS = None`. Every event is analyzed regardless of how long
+after the fire it occurred. This reverses the 2-year window applied earlier the
+same day. Scott's call, and the right one.
+
+**It could not be defended quantitatively.** Of the three criteria used to pick
+2 years, two do not survive scrutiny:
+
+* the exposure correction used a per-SOURCE horizon, crediting every fire in
+  the literature database with observation through 2021, when that database is
+  a compilation of studies each of which stopped looking when its own fieldwork
+  ended. It gave 70% of fires five or more years of apparent observation; the
+  denominator fell 29% over a range where the numerator fell 99%.
+* the season-mix criterion compared the retained sample against the full
+  sample. That is NESTED: the difference must go to zero as the cutoff grows,
+  by construction. It measured its own arithmetic, not the data, and the gap it
+  rested on was about one point.
+
+On first flows per fire the rate is already at its plateau by 1.5 yr, so 1.5
+was as defensible as 2.0 — which is another way of saying neither was.
+
+**It does not change the answer.** Across every cutoff from 0.5 yr to none the
+decisive subset holds. A filter that changes nothing but the sample size is a
+liability in review, not a safeguard. The insensitivity table is better
+evidence than any particular window.
+
+**Process is filtered on process.** Removing the window readmits 30 events, the
+longest 4.2 yr after its fire, of which NONE is landslide-initiated (27
+runoff-generated, 3 unknown). The runoff filter now excludes 11 landslide
+events rather than 4, because the long-lag tail is back in scope and screened
+on what actually distinguishes it.
+
+    analysis set    : 278 -> 308 events, 300 with a trustworthy date
+    decisive subset : 67 at 74.6% / 6.0%  ->  77 at 75.3% / 6.5%
+    60-min M2 - M1  : 119.3 -> 146.8
+    winter          : 138, 18 Dec, R 0.43
+    summer          : 135, 02 Aug, R 0.89
+
+`scripts/checks/postfire_lag_cutoff.py` is kept and repurposed. Its exposure
+correction is now per PAPER (`original_source` for literature records, the
+source itself otherwise), which roughly doubles the tail rates it reports. Its
+verdict section now records why there is no cutoff. Sections 1 and 2 stand on
+their own as a description of how long after a fire runoff-generated debris
+flows occur — a result worth reporting, and no longer measured downstream of
+the cutoff it was meant to justify.
+
+TRIAGE.md items D1 and D2, resolved together by removing the thing they
+criticized.

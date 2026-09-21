@@ -4,27 +4,34 @@ Every analysis takes its events through here, so the two scope decisions —
 how long after the fire, and which initiation process — live in one place
 instead of being re-implemented per script.
 
-The window
-----------
-`POSTFIRE_WINDOW_YEARS = 2.0`, set 2026-09-20. Postfire debris-flow
-susceptibility is concentrated in the first wet season or two after fire, and
-an event five or twenty years later is a different population. The compilation
-keeps those records — it is a database — and this filter defines what the
-seasonality analysis treats as postfire.
+No post-fire window
+-------------------
+`POSTFIRE_WINDOW_YEARS = None`. Every event is analyzed regardless of how long
+after the fire it occurred. This reverses a 2-year window applied earlier on
+2026-09-20, for two reasons that both point the same way.
 
-What the window does NOT do
----------------------------
-It is a scope decision, not a process filter, and it is a poor instrument for
-removing landslide-initiated flows. Measured on the 345-event compilation:
+**It could not be defended quantitatively.** The attempt is preserved in
+`scripts/checks/postfire_lag_cutoff.py`. Two of its three arguments do not
+survive scrutiny: the exposure correction used a per-*source* horizon, which
+credits every fire in the literature database with observation through 2021 and
+so understates the tail; and the season-mix argument compared the retained
+sample against the full sample, which is a NESTED comparison whose difference
+goes to zero as the cutoff grows by construction. On first flows per fire the
+hazard is already at its plateau by 1.5 yr, so 1.5 was as defensible as 2.0 —
+which is another way of saying neither was.
 
-    landslide-involved events within 2 yr : 8   (five under six months)
-    landslide-involved events beyond 2 yr : 7
-    runoff-generated events beyond 2 yr   : 35
+**It does not change the answer.** Across every cutoff from 0.5 yr to none, the
+decisive subset holds at 71-75% intense against 5-9% wettest. A filter that
+changes nothing except the sample size is a liability in review, not a
+safeguard.
 
-So the window keeps more than half the landslide events and discards five times
-as many runoff-generated events as landslide ones. Shallow landslides in the
-western Cascades appear about five months after fire. Initiation process is
-therefore filtered explicitly, below, rather than left to the window.
+Removing it readmits 30 events, the longest 4.2 yr after its fire. None is
+landslide-initiated: 27 are runoff-generated and 3 unknown. The landslide tail
+that the window was incidentally catching is now handled where it belongs, by
+the initiation filter below.
+
+`load_events(window_years=2.0)` reproduces the windowed sample for a
+sensitivity table.
 
 The initiation filter
 ---------------------
@@ -64,7 +71,9 @@ from .paths import PROCESSED
 __all__ = ["POSTFIRE_WINDOW_YEARS", "RUNOFF_POLICY", "LANDSLIDE_CLASSES",
            "load_events", "add_postfire_interval", "filter_runoff_generated"]
 
-POSTFIRE_WINDOW_YEARS = 2.0
+#: None = no post-fire window; see the module docstring. Pass 2.0 explicitly
+#: for the sensitivity table.
+POSTFIRE_WINDOW_YEARS: float | None = None
 
 #: `initiation_class` values that mean the source attributed the flow, wholly
 #: or partly, to landslide initiation. "mixed" is the harmonized class for
