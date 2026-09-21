@@ -259,3 +259,47 @@ it is now weaker still. Use "does not weaken". See `docs/reviews/TRIAGE.md`, B1.
 
 Found by independent subagent review (`docs/reviews/compilation.md`, corroborated
 by `independence.md` and `decisive_subset.md`).
+
+## 2026-09-20 — The fire alias table was written in a space it could not reach
+
+`norm_fire` strips "fire", "complex", "lightning" and similar words BEFORE
+looking a name up in `FIRE_ALIASES`, but the table's keys were written against
+raw strings containing exactly those words, in a word order the sources do not
+use. Two aliases were therefore dead, and two fires stayed split:
+
+    "Fish (San Gabriel Complex)"   -> fishsangabriel   (graber2023, literature)
+    "Fish"                         -> fish             (oakley2025)
+    alias key "sangabrielcomplexfish" -> unreachable
+
+    "CZU"                          -> czulightningcomplex  (cavagnaro2025)
+    "CZU August Lightning Complex" -> czuaugust            (oakley2025)
+
+`czulightningcomplex` is worth noting on its own: nothing but the alias could
+ever produce it, so it was a canonical form outside the normalizer's range.
+
+The table is now written as the names actually appear, and both sides pass
+through `_basic_norm`, so an alias cannot be expressed in a form the normalizer
+cannot produce. `_build_aliases` drops no-ops and raises on two mistakes the old
+table could have hidden silently: two raw keys normalizing to the same key with
+different values, and an alias whose value is itself a key (which would need
+transitive resolution that `norm_fire` does not do). Canonical forms are the
+full official names, which the data reaches without an alias at all.
+
+    events: 328 -> 322
+    `fish` now draws on graber2023, literature and oakley2025
+    `czuaugust` now draws on cavagnaro2025 and oakley2025
+
+**Checked and deliberately NOT merged.** Three other name pairs look like
+aliases and are not: cedar/cedarcreek are 1,761 km apart, river/riverside 957
+km, and slink/slinkard are 16 km apart but are a 2020 California fire and a
+2017 Nevada fire. Name similarity is not evidence; fire year, state and
+location were checked in each case.
+
+Effect on the result, with A1 already in place:
+
+    decisive subset : 67 at 74.6% / 6.0%  (unchanged by A2)
+    winter          : 128, 26 Dec, R 0.47
+    60-min M2 - M1  : 118.9
+
+Found by independent subagent review (`docs/reviews/compilation.md`).
+TRIAGE.md item A2.

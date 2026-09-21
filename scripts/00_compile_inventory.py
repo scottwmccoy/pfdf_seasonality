@@ -231,30 +231,67 @@ _FIRE_DROP = re.compile(
 )
 
 # Fires that are named differently between sources. Maps normalized -> canonical.
-FIRE_ALIASES = {
-    "grandprixold": "grandprix",
-    "old": "grandprix",  # 2003 Grand Prix/Old burned as one area, reported jointly
-    "czu": "czulightningcomplex",
-    "czulightning": "czulightningcomplex",
-    "sangabrielcomplexfish": "fish",
-    "sangabrielcomplex": "fish",
-    "eldorado": "eldorado",
-    "apple": "apple",
-    "whitewaterbaldycomplex": "whitewaterbaldy",
-    "twentyfivemile": "25mile",
-    "cubcreek2": "cubcreek",
-    "beachiecreeklionshead": "beachiecreek",
-    "inyocomplex": "inyo",
-    "sawtooth": "sawtooth",
+def _basic_norm(name) -> str:
+    """Drop-and-strip only, with no alias lookup, so it can build the table."""
+    if pd.isna(name):
+        return ""
+    return re.sub(r"[^a-z0-9]+", "", _FIRE_DROP.sub(" ", str(name)).lower())
+
+
+#: Fires named differently between sources, written as the names ACTUALLY
+#: appear in the data. Both sides go through `_basic_norm`, so an alias can
+#: never be written in a form the normalizer is unable to produce.
+#:
+#: That was the defect here until 2026-09-20: the table was written against
+#: raw strings, but `_FIRE_DROP` strips "complex" and "lightning" BEFORE the
+#: lookup, and the keys used a word order the sources do not use. So
+#: `sangabrielcomplexfish` was unreachable while the data actually produced
+#: `fishsangabriel` from "Fish (San Gabriel Complex)" and `fish` from Oakley —
+#: one fire under two keys. Likewise "CZU" reached `czulightningcomplex`, a
+#: string nothing else can produce, while Oakley's "CZU August Lightning
+#: Complex" reached `czuaugust`.
+#:
+#: Canonical forms are therefore the full official names, which are reachable
+#: from the data without an alias at all.
+_FIRE_ALIAS_NAMES = {
+    # 2003 Grand Prix/Old burned as one area and are reported jointly
+    "Grand Prix-Old": "Grand Prix",
+    "Old": "Grand Prix",
+    # point sources abbreviate; Oakley gives the full incident name
+    "CZU": "CZU August Lightning Complex",
+    # point sources qualify Fish with its complex; Oakley does not
+    "Fish (San Gabriel Complex)": "Fish",
+    "San Gabriel Complex": "Fish",
+    "Whitewater-Baldy Complex": "Whitewater-Baldy",
+    "Twentyfive Mile": "25 Mile",
+    "Cub Creek 2": "Cub Creek",
+    "Beachie Creek-Lionshead": "Beachie Creek",
+    "Inyo Complex": "Inyo",
 }
 
 
+def _build_aliases(names: dict[str, str]) -> dict[str, str]:
+    """Normalize both sides, dropping no-ops and refusing to hide a mistake."""
+    out: dict[str, str] = {}
+    for raw_k, raw_v in names.items():
+        k, v = _basic_norm(raw_k), _basic_norm(raw_v)
+        if k == v:
+            continue  # the drop rules already collapse this one
+        if out.get(k, v) != v:
+            raise ValueError(f"fire alias {raw_k!r} normalizes to {k!r}, which is "
+                             f"already mapped to {out[k]!r}, not {v!r}")
+        out[k] = v
+    chained = {k for k, v in out.items() if v in out}
+    if chained:
+        raise ValueError(f"fire aliases chain, which is not resolved: {sorted(chained)}")
+    return out
+
+
+FIRE_ALIASES = _build_aliases(_FIRE_ALIAS_NAMES)
+
+
 def norm_fire(name) -> str:
-    if pd.isna(name):
-        return ""
-    s = str(name)
-    s = _FIRE_DROP.sub(" ", s)
-    s = re.sub(r"[^a-z0-9]+", "", s.lower())
+    s = _basic_norm(name)
     return FIRE_ALIASES.get(s, s)
 
 
