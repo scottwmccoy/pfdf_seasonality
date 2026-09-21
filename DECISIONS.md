@@ -160,3 +160,53 @@ fitted baseline that improved more, 67 -> 54 -> 52 d.
 
 Pinned in `tests/test_headline_numbers.py`, including a structural test that no
 landslide-initiated event can reach the analysis under either policy.
+
+## 2026-09-20 — Station Fire date erratum in the Cavagnaro release
+
+The Cavagnaro figshare release
+(`data/raw/inventories/cavagnaro_figshare/PublicCodes/DFObsHydroclimatePubNew_attributes.xlsx`)
+carries the Station Fire (2009) block with `StormDate` shifted forward by
+exactly four years: 11/13/2013 for a storm that happened 2009-11-13. All 489
+Station rows are affected, 108 of them `Response == 1`. `scripts/00_compile_inventory.py`
+corrects it in `_fix_station_fire_dates`, guarded on the symptom rather than on
+the fire name, so a corrected upstream file passes through untouched.
+
+**The evidence.**
+
+1. The shift is upstream, not ours. The loader passes `StormDate` through
+   without arithmetic; the spreadsheet itself holds the 2013-2014 dates beside
+   `Year = 2009`.
+2. Station is the only fire affected. Of 43 fires in the file, 41 have their
+   first storm 0 or 1 years after the fire year. Station is at +4. (Boot 2018
+   sits at +3 from a personal communication — a separate, 5-row question.)
+3. `volumes227`, an independent USGS release, records the same Station Fire
+   storms at 2009-11-12, 2009-12-11, 2010-01-18 and 2010-02-06 — Cavagnaro's
+   dates minus exactly four years, matching to within a day for four of five.
+4. Staley et al. (2016), named in the file as the source for these records,
+   tabulates `Station stn California 2009 600 108`: 108 debris-flow basins,
+   exactly the 108 `Response == 1` rows. The count survived the transfer; the
+   dates did not.
+
+**Why it mattered more than five dates.** The `literature` source (McGuire et
+al. 2024) also carries Staley-2016-derived records, correctly dated. With the
+four-year offset the compilation held the same observations twice and could not
+recognize them, because de-duplication matches on date. Correcting the dates let
+them merge:
+
+    records : 3,634 -> 3,526   (104 literature + 4 volumes227 were duplicates)
+    events  : 345   -> 339
+    Station events now sit in the first winter after the fire, 0.2-0.5 yr,
+    where 5 of them had been excluded by the 2-year window at 4.2-4.5 yr
+
+**What it did not change.** The decisive subset is still 76 events at 73.7% vs
+7.9%; the robustness control still 74.3 / 86.7; both regime dates, both R
+values, 87% / 83%, and 39 vs 52 days are all unmoved. Only denominators and
+counts shifted. The database was wrong; the result was not sensitive to it.
+
+**One consequence for our own analysis.** The 4.0-4.5 yr bump in the
+exposure-corrected rate panel of `scripts/checks/postfire_lag_cutoff.py` was
+this artifact, not a feature of postfire susceptibility. That figure and report
+were regenerated.
+
+Found by an independent subagent review, 2026-09-20 (`docs/reviews/compilation.md`
+in the Box tree). Reported to the author for correction upstream.

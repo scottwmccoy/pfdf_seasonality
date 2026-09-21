@@ -357,9 +357,37 @@ def finish(df: pd.DataFrame, source_key: str) -> pd.DataFrame:
 # ----------------------------------------------------------------------------
 
 
+#: Upstream erratum, found 2026-09-20. In the Cavagnaro figshare release the
+#: Station Fire (2009) block carries `StormDate` shifted forward by exactly four
+#: years — 11/13/2013 for a storm that happened 2009-11-13. All 489 Station rows
+#: are affected (108 of them Response == 1); no other fire in the file is.
+#: See DECISIONS.md, "Station Fire date erratum", for the evidence.
+#: Reported to the author; drop this correction once the release is fixed.
+STATION_SHIFT_YEARS = 4
+
+
+def _fix_station_fire_dates(c: pd.DataFrame) -> pd.DataFrame:
+    """Undo the +4-year shift on the Station Fire block.
+
+    Guarded on the symptom rather than on the fire name alone, so a corrected
+    upstream file passes through untouched instead of being shifted twice.
+    """
+    c = c.copy()
+    sd = pd.to_datetime(c["StormDate"], errors="coerce")
+    bad = (c["Fire Name"].astype(str).str.strip().eq("Station")
+           & c["Year"].eq(2009)
+           & ((sd.dt.year - c["Year"]) >= 3))
+    if bad.any():
+        c.loc[bad, "StormDate"] = sd[bad] - pd.DateOffset(years=STATION_SHIFT_YEARS)
+        print(f"  cavagnaro2025: corrected {int(bad.sum())} Station Fire dates by "
+              f"-{STATION_SHIFT_YEARS} yr (upstream erratum; see DECISIONS.md)")
+    return c
+
+
 def load_cavagnaro() -> pd.DataFrame:
     p = RAW / "cavagnaro_figshare/PublicCodes/DFObsHydroclimatePubNew_attributes.xlsx"
     c = pd.read_excel(p)
+    c = _fix_station_fire_dates(c)
     c = c[c["Response"] == 1].copy()
     out = pd.DataFrame(
         {

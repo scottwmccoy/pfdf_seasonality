@@ -52,41 +52,41 @@ class Pin:
 PINS: list[Pin] = [
     # ---------------------------------------------------------- the database
     Pin("compilation_report.txt", "unique fire-by-date events",
-        r"unique events\s+:\s+(\d+)", 345, quoted_in="abstract: 'over 300'"),
+        r"unique events\s+:\s+(\d+)", 339, quoted_in="abstract: 'over 300'"),
     Pin("compilation_report.txt", "debris-flow records after de-duplication",
-        r"after de-duplication\s+:\s+(\d+)", 3634, quoted_in="abstract: 'over 3,500'"),
+        r"after de-duplication\s+:\s+(\d+)", 3526, quoted_in="abstract: 'over 3,500'"),
 
     # ------------------------------------------------ the analysis-stage scope
     # Guards the two filters in `pfdf_seasonality.events`. If either is silently
     # disabled, these move before any result does.
     Pin("analysis_report.txt", "events inside the 2-year post-fire window",
-        r"-> (\d+) within 2 yr of fire", 302,
+        r"-> (\d+) within 2 yr of fire", 301,
         quoted_in="paper methods: the post-fire window"),
     Pin("analysis_report.txt", "events after the runoff-generated filter",
-        r"-> (\d+) runoff-generated", 298,
+        r"-> (\d+) runoff-generated", 297,
         quoted_in="paper methods: landslide-initiated events excluded"),
 
     # -------------------------------------------- the core result (60-min gauge)
     Pin("analysis_report.txt", "60-min M2 minus M1 log-likelihood",
-        r"M2 - M1 = \+([\d.]+)", 126.4, tol=0.05,
+        r"M2 - M1 = \+([\d.]+)", 126.7, tol=0.05,
         after="60m short-duration model",
         quoted_in="abstract: 'intensity model beats both'"),
     Pin("analysis_report.txt", "decisive subset size (60-min)",
         r"60m: (\d+)/\d+ events where wettest", 76,
         quoted_in="abstract: '28% of events'"),
     Pin("analysis_report.txt", "events scored at 60-min",
-        r"60m: \d+/(\d+) events where wettest", 270,
+        r"60m: \d+/(\d+) events where wettest", 269,
         quoted_in="abstract: '28% of events' denominator"),
     Pin("analysis_report.txt", "decisive flows in the most-intense season",
         r"debris flow in the most-intense-60m season\s*:\s*([\d.]+)%", 73.7, tol=0.05,
         quoted_in="abstract: '74%' of the 9:1"),
     Pin("analysis_report.txt", "decisive flows in the wettest season",
         r"debris flow in the wettest season\s*:\s*([\d.]+)%", 7.9, tol=0.05,
-        after="60m: 76/270", quoted_in="abstract: '8%' of the 9:1"),
+        after="60m: 76/269", quoted_in="abstract: '8%' of the 9:1"),
 
     # ------------------------------------------------------------- the regimes
     Pin("analysis_report.txt", "winter regime, n events",
-        r"DJF-dominant rainfall\s+\(n = (\d+)", 134),
+        r"DJF-dominant rainfall\s+\(n = (\d+)", 133),
     # anchored on the regime header, not on each other's values, so a change in
     # R does not also break the date pin with a misleading "wording changed"
     Pin("analysis_report.txt", "winter regime mean date",
@@ -168,7 +168,7 @@ PINS: list[Pin] = [
 
     # ------------------------------ CONUS404 as the second line of evidence
     Pin("conus404_hourly_analysis_report.txt", "decisive subset size (1-hour)",
-        r"(\d+)/290 events where wettest season", 90),
+        r"(\d+)/289 events where wettest season", 90),
     Pin("conus404_hourly_analysis_report.txt", "decisive flows in the intense season",
         r"debris flow in the most-intense season :\s+([\d.]+)%", 57.8, tol=0.05),
     Pin("conus404_hourly_analysis_report.txt", "decisive flows in the wettest season",
