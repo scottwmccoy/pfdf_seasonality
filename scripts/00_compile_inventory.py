@@ -847,6 +847,96 @@ def load_oakley_events() -> pd.DataFrame:
 # ----------------------------------------------------------------------------
 
 
+#: One storm, two dates: how far apart the dates may be, and how close the two
+#: sets of points must be to count as the same flows. The distance does the
+#: discriminating; the day window only widens the candidate set.
+STORM_DAY_TOL = 2
+STORM_SAME_FLOW_M = 250.0
+
+
+def canonicalize_storm_dates(p: pd.DataFrame,
+                             day_tol: int = STORM_DAY_TOL,
+                             radius_m: float = STORM_SAME_FLOW_M) -> pd.DataFrame:
+    """Give one storm one date, where the evidence says it is one storm.
+
+    Sources disagree about what date a flow carries — `DATE_BASIS` records
+    storm start for some and the observation for others, and a multi-day
+    atmospheric river can be dated anywhere inside it. Grouping events on an
+    exact date therefore splits a single storm in two when two sources date it
+    differently.
+
+    Measured 2026-09-20, eleven same-fire event pairs sit within three days of
+    each other with no source in common. Date proximity alone does not settle
+    them, so this requires the two sets of points to BE the same flows: the
+    median nearest-neighbour distance between them must be within `radius_m`,
+    the same radius the record-level de-duplication uses.
+
+    That test is what separates the cases:
+
+        Butte  2016-03-04 vs 03-06   median   0 m  -> one storm
+        Dolan  2021-01-26 vs 01-27   median  22 m  -> one storm
+        Station, Sayre, Monument, Tadpole  339-3,514 m  -> left alone
+        Whitewater-Baldy 09-14/15/16 vs 09-17  7-25 km -> a real monsoon
+                                                          sequence, left alone
+
+    The surviving date comes from the highest-priority source present, not from
+    whichever is earlier, so Dolan keeps 2021-01-27 — the storm date the
+    Cavagnaro GRL paper assigns, not the 26th that `czu2021` carries for the
+    start of the same atmospheric river.
+
+    Deliberately NOT done at record level: widening the de-duplication's own
+    date window merges 208 Dolan segment records into higher-priority basin
+    points, because that inventory maps stream segments about 10 m apart and a
+    single point sits within 250 m of many of them. That is a scale mismatch,
+    not a date-convention problem, and it belongs to record comparability
+    rather than here.
+    """
+    p = p.copy()
+    prio = p.source_key.map(SOURCE_PRIORITY).fillna(99)
+    merges = []
+    for fk, g in p.groupby("fire_key", sort=False):
+        dates = sorted(d for d in g.event_date.dropna().unique())
+        if len(dates) < 2:
+            continue
+        for i in range(len(dates) - 1):
+            for j in range(i + 1, len(dates)):
+                gap = (dates[j] - dates[i]) / np.timedelta64(1, "D")
+                if gap > day_tol:
+                    break
+                A = g[g.event_date == dates[i]]
+                B = g[g.event_date == dates[j]]
+                if set(A.source_key) & set(B.source_key):
+                    continue          # one source dates them apart on purpose
+                if not len(A) or not len(B):
+                    continue
+                # ONE projection over both sets: `_to_local_xy` derives its
+                # reference latitude from the data it is handed, so projecting
+                # A and B separately puts them on different planes and inflates
+                # the distance between them.
+                XY = _to_local_xy(
+                    np.r_[A.latitude.to_numpy(), B.latitude.to_numpy()],
+                    np.r_[A.longitude.to_numpy(), B.longitude.to_numpy()])
+                xa, xb = XY[:len(A)], XY[len(A):]
+                d, _ = cKDTree(xb).query(xa)
+                if np.median(d) > radius_m:
+                    continue          # different flows, so a different storm
+                keep = dates[i] if prio[A.index].min() <= prio[B.index].min() else dates[j]
+                drop = dates[j] if keep == dates[i] else dates[i]
+                merges.append((fk, drop, keep, float(np.median(d))))
+
+    if merges:
+        print("\nOne storm under two dates (same fire, no shared source, "
+              "same flows within "
+              f"{radius_m:.0f} m) ...")
+        for fk, drop, keep, med in merges:
+            m = p.fire_key.eq(fk) & p.event_date.eq(drop)
+            print(f"  {fk:<16} {str(pd.Timestamp(drop).date())} -> "
+                  f"{str(pd.Timestamp(keep).date())}  "
+                  f"({int(m.sum())} records, median {med:.0f} m apart)")
+            p.loc[m, "event_date"] = keep
+    return p
+
+
 def _to_local_xy(lat, lon):
     """Equirectangular projection to metres; fine over a few-hundred-metre search."""
     r = 6371000.0
@@ -950,6 +1040,7 @@ def build_events(points: pd.DataFrame, oakley: pd.DataFrame, day_tol: int = 1):
         "unnamed_" + p.record_id,
         p.group_key,
     )
+    p = canonicalize_storm_dates(p)
     ev = (
         p.groupby(["fire_key", "event_date"], sort=False)
         .agg(

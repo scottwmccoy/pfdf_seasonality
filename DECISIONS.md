@@ -303,3 +303,49 @@ Effect on the result, with A1 already in place:
 
 Found by independent subagent review (`docs/reviews/compilation.md`).
 TRIAGE.md item A2.
+
+## 2026-09-20 — One storm under two dates
+
+Events were grouped on an exact `(fire_key, event_date)`, so a storm two
+sources dated differently became two events. Sources genuinely disagree about
+what date a flow carries — `DATE_BASIS` records storm start for some and the
+observation for others, and a multi-day atmospheric river can be dated anywhere
+inside it.
+
+Eleven same-fire event pairs sit within three days of each other with no source
+in common. **Date proximity does not settle them**, so `canonicalize_storm_dates`
+requires the two sets of points to BE the same flows: median nearest-neighbour
+distance within 250 m, the same radius record-level de-duplication uses. The
+distance does the discriminating; the day window only widens the candidate set.
+
+    Butte  2016-03-04 vs 03-06   median     0 m  -> merged
+    Dolan  2021-01-26 vs 01-27   median    22 m  -> merged
+    Station (x3), Sayre, Monument, Tadpole  339-3,514 m  -> left alone
+    Whitewater-Baldy 09-14/15/16 vs 09-17   7-25 km      -> left alone,
+        a real monsoon sequence: graber2024 dates three storms and the
+        literature record is 25 km from the nearest of them
+
+The surviving date comes from the highest-priority source present, not from
+whichever is earlier, so Dolan keeps 2021-01-27 — the storm date the Cavagnaro
+GRL paper assigns — rather than the 26th that `czu2021` carries for the start
+of the same atmospheric river. Dolan is now one event of 2,124 flows drawing on
+all four sources.
+
+    events: 322 -> 320
+
+**Rejected: widening the record-level de-duplication's date window.** It looks
+like the natural fix and is not. At +/-2 days it merges 224 extra records, 208
+of them Dolan segments absorbed into higher-priority basin points, because that
+inventory maps stream segments about 10 m apart and one point sits within 250 m
+of many. That is the record-comparability problem, not a date-convention one,
+and conflating them would have quietly deleted 10% of the database.
+
+**A footgun worth naming.** `_to_local_xy` takes its reference latitude from
+whatever array it is handed, so projecting two sets separately puts them on
+different planes. It bit this session twice — first in the literature fire
+matching, then here, where it inflated the Dolan distance enough to suppress
+the merge while Butte still passed because its two sets are at identical
+coordinates. Any comparison across two frames must project them together.
+
+Found by independent subagent review (`docs/reviews/compilation.md`).
+TRIAGE.md item A3.
