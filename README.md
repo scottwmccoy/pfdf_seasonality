@@ -4,13 +4,20 @@ What sets the time of year that postfire debris flows occur across the western
 United States, and how far ahead it can be predicted.
 
 The result: debris-flow seasonality follows the climatology of **intense
-short-duration rainfall**, not rainfall amount. Where those two diverge, flows
-follow intensity by roughly 9:1. That makes the expected time of year
-predictable from prefire climatology and the ignition date alone, to a 41-day
-median error — better than a constant-lag model fit to the observations
-(67 days).
+short-duration rainfall**, not rainfall amount. Where those two diverge, the
+intensity climatology assigns more probability to the month the flow actually
+occurred in 90% of cases (69 of 77, binomial p = 3×10⁻¹³). That makes the
+expected time of year predictable from prefire climatology and the ignition
+date alone, to a 41-day median error — better than a constant-lag model fit to
+the observations (54 days).
 
-Supports the AGU Fall Meeting 2026 abstract and the manuscript in preparation.
+Built from 320 fire-by-date events across 3,204 published debris-flow records.
+
+Supports the AGU Fall Meeting 2026 abstract and a manuscript in preparation.
+**Numbers here are current as of the last run, not final** — the abstract was
+submitted before several corrections to the compilation, and `DECISIONS.md`
+records what changed and why. Anything quoted from this repository should be
+checked against the generated reports rather than against the abstract.
 
 ## Two trees
 
@@ -68,6 +75,7 @@ processed tables already in Box, so a normal session starts at `10_`.
 | Core analysis | `10`–`12` | Model comparison, ignition lags, first-flow forecast |
 | Reanalysis comparison | `20`–`25` | `20`/`21` re-extract CONUS404: ~770 GB of cloud reads, hours. Do not run casually |
 | Figures | `scripts/plots/` | Write to `$PFDF_SEASONALITY_DATA/results/figures/` |
+| Checks | `scripts/checks/` | Standalone audits: record comparability, date basis, post-fire lags, independent-review follow-ups |
 
 ```bash
 python scripts/10_analyze_seasonality.py

@@ -161,7 +161,7 @@ fitted baseline that improved more, 67 -> 54 -> 52 d.
 Pinned in `tests/test_headline_numbers.py`, including a structural test that no
 landslide-initiated event can reach the analysis under either policy.
 
-## 2026-09-20 — Station Fire date erratum in the Cavagnaro release
+## 2026-09-20 — Station Fire dates in the Cavagnaro release need an offset
 
 The Cavagnaro figshare release
 (`data/raw/inventories/cavagnaro_figshare/PublicCodes/DFObsHydroclimatePubNew_attributes.xlsx`)
@@ -208,8 +208,11 @@ exposure-corrected rate panel of `scripts/checks/postfire_lag_cutoff.py` was
 this artifact, not a feature of postfire susceptibility. That figure and report
 were regenerated.
 
-Found by an independent subagent review, 2026-09-20 (`docs/reviews/compilation.md`
-in the Box tree). Reported to the author for correction upstream.
+Found by an independent code review, 2026-09-20. The correction here is local
+to this compilation; the discrepancy is being raised with the data release's
+authors, and this note should be revisited once they have looked at it. Nothing
+in this repository should be read as a statement about the release on their
+behalf.
 
 ## 2026-09-20 — Literature fire identity: EventID is a storm, not a fire
 

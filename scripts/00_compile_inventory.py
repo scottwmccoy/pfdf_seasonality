@@ -402,12 +402,12 @@ def finish(df: pd.DataFrame, source_key: str) -> pd.DataFrame:
 # ----------------------------------------------------------------------------
 
 
-#: Upstream erratum, found 2026-09-20. In the Cavagnaro figshare release the
+#: Found 2026-09-20, and local to this compilation. In the Cavagnaro release the
 #: Station Fire (2009) block carries `StormDate` shifted forward by exactly four
 #: years — 11/13/2013 for a storm that happened 2009-11-13. All 489 Station rows
 #: are affected (108 of them Response == 1); no other fire in the file is.
-#: See DECISIONS.md, "Station Fire date erratum", for the evidence.
-#: Reported to the author; drop this correction once the release is fixed.
+#: See DECISIONS.md for the evidence. The discrepancy is being raised with the
+#: release's authors; drop this correction if a revised release resolves it.
 STATION_SHIFT_YEARS = 4
 
 
@@ -425,7 +425,7 @@ def _fix_station_fire_dates(c: pd.DataFrame) -> pd.DataFrame:
     if bad.any():
         c.loc[bad, "StormDate"] = sd[bad] - pd.DateOffset(years=STATION_SHIFT_YEARS)
         print(f"  cavagnaro2025: corrected {int(bad.sum())} Station Fire dates by "
-              f"-{STATION_SHIFT_YEARS} yr (upstream erratum; see DECISIONS.md)")
+              f"-{STATION_SHIFT_YEARS} yr (see DECISIONS.md)")
     return c
 
 
