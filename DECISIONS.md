@@ -558,3 +558,36 @@ Stale counts through the draft were refreshed at the same time (320 events,
 3,204 records, 4,062 raw, 169 fires, 284 MTBS matches, 26 of 300 events with no
 Atlas 14 coverage). The published abstract body is untouched; its superseded
 table carries the current values.
+
+## 2026-09-20 — The compiled database cannot be published as it stands
+
+Checked while preparing a GitHub release asset, and the answer was no.
+
+**Oakley et al. (2025) is CC BY-NC-ND 4.0.** The NoDerivatives clause prohibits
+distributing adaptations, and our compilation — standardized, de-duplicated,
+re-keyed, merged with seven other sources — is squarely an adaptation rather
+than a copy. It touches 97 of 320 events and 36 exist only through it.
+**Cavagnaro's figshare licence could not be verified** (the landing page
+returned 403); it contributes 389 records and 66 events.
+
+Only a licensor can waive ND, so there is no wording or framing that makes the
+full compilation publishable without permission. Options, recorded so this is
+not re-derived:
+
+* ask the Oakley team for written permission and confirm the figshare terms —
+  the only route to releasing the whole thing, and both groups are plausible
+  co-authors, so it is a short conversation rather than a negotiation
+* release the public-domain subset alone: 2,815 records, 187 events, USGS
+  releases only, which needs nobody's permission but drops 42% of events
+* release only the generated reports, which are our own analysis output and
+  redistribute no one's data
+* leave the repository code-only, which is what `NOTICE.md` already promises
+
+**Decision: hold off entirely**, and revisit at submission, when the
+data-availability statement forces the question anyway. `NOTICE.md` now records
+each source's licence and redistributability so the next person does not have
+to look them up again.
+
+Worth noting for that conversation: the paper is strengthened, not weakened, by
+the sources being separately citable. The compilation is a derived product and
+the source teams should be credited for the observations either way.
